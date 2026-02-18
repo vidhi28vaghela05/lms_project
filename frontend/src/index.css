@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  font-family: 'Outfit', sans-serif;
+  --primary-dark: #1d3557;
+  --primary-light: #457b9d;
+  --accent: #e63946;
+  --bg-light: #f8f9fa;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-light);
+  color: var(--primary-dark);
+}
+
+.ant-card {
+  border-radius: 20px !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+  border: none !important;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.ant-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+}
+
+.ant-btn-primary {
+  border-radius: 12px !important;
+  height: auto !important;
+  padding: 10px 24px !important;
+  font-weight: 600 !important;
+  background: var(--primary-dark) !important;
+  border: none !important;
+  box-shadow: 0 4px 14px 0 rgba(29, 53, 87, 0.3) !important;
+}
+
+.ant-btn-primary:hover {
+  background: var(--primary-light) !important;
+  transform: scale(1.02);
+}
+
+.ant-layout-sider {
+  background: var(--primary-dark) !important;
+  box-shadow: 4px 0 24px rgba(0,0,0,0.1);
+}
+
+.ant-menu {
+  background: transparent !important;
+  border: none !important;
+}
+
+.ant-menu-item {
+  color: rgba(255,255,255,0.7) !important;
+  border-radius: 12px !important;
+  margin: 8px !important;
+}
+
+.ant-menu-item-selected {
+  background: rgba(255,255,255,0.15) !important;
+  color: #fff !important;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+}
+
+h1, h2, h3, h4 {
+  font-weight: 700 !important;
+  letter-spacing: -0.5px;
+}
