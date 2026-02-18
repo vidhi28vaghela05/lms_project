@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const path = require('path');
 const connectDB = require('./config/db');
 
 dotenv.config();
@@ -23,8 +24,15 @@ app.use('/api/enrollments', require('./routes/enrollments'));
 app.use('/api/instructor', require('./routes/instructor'));
 app.use('/api/admin', require('./routes/admin'));
 
-app.get('/', (req, res) => {
-  res.send('Next-Gen LMS API is running...');
+// Serve Frontend Static Files
+const frontendBuildPath = path.join(__dirname, '../frontend/dist');
+app.use(express.static(frontendBuildPath));
+
+// Handle React Routing
+app.use((req, res) => {
+  if (!req.url.startsWith('/api')) {
+    res.sendFile(path.join(frontendBuildPath, 'index.html'));
+  }
 });
 
 // Error handling middleware

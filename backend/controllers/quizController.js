@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Quiz = require('../models/Quiz');
 
 exports.createQuiz = async (req, res) => {
@@ -19,7 +20,6 @@ exports.getQuizzesByCourse = async (req, res) => {
 };
 
 exports.submitQuiz = async (req, res) => {
-  // Logic for auto-scoring and unlocking next course
   try {
     const { answers, courseId } = req.body;
     const quizzes = await Quiz.find({ courseId });
@@ -30,7 +30,35 @@ exports.submitQuiz = async (req, res) => {
     });
 
     const percentage = (score / quizzes.length) * 100;
-    res.json({ score, percentage, passed: percentage >= 80 });
+    
+    let recommendations = [];
+    let unlocked = [];
+
+    const currentCourse = await mongoose.model('Course').findById(courseId);
+
+    if (percentage < 50) {
+      // Recommend beginner courses in the same skill area
+      recommendations = await mongoose.model('Course').find({
+        level: 'beginner',
+        skillsCovered: { $in: currentCourse.skillsCovered },
+        _id: { $ne: courseId }
+      }).limit(2);
+    } else if (percentage >= 80) {
+      // Unlock next level courses
+      const nextLevel = currentCourse.level === 'beginner' ? 'intermediate' : 'advanced';
+      unlocked = await mongoose.model('Course').find({
+        level: nextLevel,
+        skillsCovered: { $in: currentCourse.skillsCovered }
+      }).limit(2);
+    }
+
+    res.json({ 
+      score, 
+      percentage, 
+      passed: percentage >= 80,
+      recommendations,
+      unlocked
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
