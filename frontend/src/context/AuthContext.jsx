@@ -10,8 +10,9 @@ export const AuthProvider = ({ children }) => {
         const token = localStorage.getItem('token');
         const role = localStorage.getItem('role');
         const name = localStorage.getItem('name');
+        const _id = localStorage.getItem('_id');
         if (token) {
-            setUser({ token, role, name });
+            setUser({ token, role, name, _id });
         }
         setLoading(false);
     }, []);
@@ -20,6 +21,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('token', userData.token);
         localStorage.setItem('role', userData.role);
         localStorage.setItem('name', userData.name);
+        localStorage.setItem('_id', userData._id);
         setUser(userData);
     };
 

@@ -16,7 +16,6 @@ const Login = () => {
             const { data } = await api.post('/auth/login', values);
             login(data);
             message.success('Welcome to the LMS Ecosystem');
-            localStorage.setItem('_id', data._id); // Store ID for routing logic
             navigate('/dashboard');
         } catch (error) {
             message.error(error.response?.data?.message || 'Authentication failed');
