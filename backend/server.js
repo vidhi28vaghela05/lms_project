@@ -14,6 +14,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+console.log('Loaded middleware');
+
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/courses', require('./routes/courses'));
@@ -23,6 +25,8 @@ app.use('/api/quizzes', require('./routes/quizzes'));
 app.use('/api/enrollments', require('./routes/enrollments'));
 app.use('/api/instructor', require('./routes/instructor'));
 app.use('/api/admin', require('./routes/admin'));
+
+console.log('Loaded routes');
 
 // Serve Frontend Static Files
 const frontendBuildPath = path.join(__dirname, '../frontend/dist');
@@ -37,6 +41,7 @@ app.use((req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
+  console.error('ERROR HANDLER:', err);
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
   res.status(statusCode).json({
     message: err.message,
