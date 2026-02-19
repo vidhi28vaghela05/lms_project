@@ -9,16 +9,39 @@ const { Title, Text } = Typography;
 
 const Login = () => {
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { login, user } = useAuth();
+    const [form] = Form.useForm();
+    const [loading, setLoading] = React.useState(false);
+
+    // If already logged in, redirect to dashboard
+    React.useEffect(() => {
+        if (user) {
+            navigate('/dashboard');
+        }
+    }, [user, navigate]);
 
     const onFinish = async (values) => {
         try {
+            setLoading(true);
             const { data } = await api.post('/auth/login', values);
+            
+            if (!data.token || !data._id) {
+                throw new Error('Invalid response from server');
+            }
+            
             login(data);
+            form.resetFields();
             message.success('Welcome to the LMS Ecosystem');
-            navigate('/dashboard');
+            
+            // Use setTimeout to ensure state updates complete before navigation
+            setTimeout(() => {
+                navigate('/dashboard');
+            }, 500);
         } catch (error) {
-            message.error(error.response?.data?.message || 'Authentication failed');
+            setLoading(false);
+            const errorMessage = error.response?.data?.message || error.message || 'Authentication failed';
+            message.error(errorMessage);
+            console.error('Login error:', error);
         }
     };
 
@@ -46,10 +69,12 @@ const Login = () => {
                 </div>
 
                 <Form
+                    form={form}
                     name="login"
                     onFinish={onFinish}
                     layout="vertical"
                     size="large"
+                    disabled={loading}
                 >
                     <Form.Item
                         name="email"
@@ -66,8 +91,15 @@ const Login = () => {
                     </Form.Item>
 
                     <Form.Item>
-                        <Button type="primary" htmlType="submit" block icon={<ArrowRightOutlined />}>
-                            Access Dashboard
+                        <Button 
+                            type="primary" 
+                            htmlType="submit" 
+                            block 
+                            icon={<ArrowRightOutlined />}
+                            loading={loading}
+                            disabled={loading}
+                        >
+                            {loading ? 'Authenticating...' : 'Access Dashboard'}
                         </Button>
                     </Form.Item>
 

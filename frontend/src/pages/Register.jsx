@@ -9,16 +9,39 @@ const { Title, Text } = Typography;
 
 const Register = () => {
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { login, user } = useAuth();
+    const [form] = Form.useForm();
+    const [loading, setLoading] = React.useState(false);
+
+    // If already logged in, redirect to dashboard
+    React.useEffect(() => {
+        if (user) {
+            navigate('/dashboard');
+        }
+    }, [user, navigate]);
 
     const onFinish = async (values) => {
         try {
+            setLoading(true);
             const { data } = await api.post('/auth/register', values);
+            
+            if (!data.token || !data._id) {
+                throw new Error('Invalid response from server');
+            }
+            
             login(data);
-            message.success('Registration successful! Welcome to the ecosystem.');
-            navigate('/dashboard');
+            form.resetFields();
+            message.success('Registration successful! Redirecting to dashboard...');
+            
+            // Use setTimeout to ensure state updates complete before navigation
+            setTimeout(() => {
+                navigate('/dashboard');
+            }, 500);
         } catch (error) {
-            message.error(error.response?.data?.message || 'Registration failed. Try again later.');
+            setLoading(false);
+            const errorMessage = error.response?.data?.message || error.message || 'Registration failed. Try again later.';
+            message.error(errorMessage);
+            console.error('Registration error:', error);
         }
     };
 
@@ -48,11 +71,13 @@ const Register = () => {
                 </div>
 
                 <Form
+                    form={form}
                     name="register"
                     onFinish={onFinish}
                     layout="vertical"
                     size="large"
                     autoComplete="off"
+                    disabled={loading}
                 >
                     <Form.Item
                         name="name"
@@ -105,6 +130,8 @@ const Register = () => {
                             htmlType="submit"
                             block
                             icon={<RocketOutlined />}
+                            loading={loading}
+                            disabled={loading}
                             style={{
                                 height: 50,
                                 borderRadius: 8,
@@ -115,7 +142,7 @@ const Register = () => {
                                 boxShadow: '0 4px 14px 0 rgba(230, 57, 70, 0.39)'
                             }}
                         >
-                            Get Started
+                            {loading ? 'Creating Account...' : 'Get Started'}
                         </Button>
                     </Form.Item>
 
