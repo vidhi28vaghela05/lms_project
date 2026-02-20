@@ -24,15 +24,15 @@ const Login = () => {
         try {
             setLoading(true);
             const { data } = await api.post('/auth/login', values);
-            
+
             if (!data.token || !data._id) {
                 throw new Error('Invalid response from server');
             }
-            
+
             login(data);
             form.resetFields();
             message.success('Welcome to the LMS Ecosystem');
-            
+
             // Use setTimeout to ensure state updates complete before navigation
             setTimeout(() => {
                 navigate('/dashboard');
@@ -91,10 +91,10 @@ const Login = () => {
                     </Form.Item>
 
                     <Form.Item>
-                        <Button 
-                            type="primary" 
-                            htmlType="submit" 
-                            block 
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            block
                             icon={<ArrowRightOutlined />}
                             loading={loading}
                             disabled={loading}

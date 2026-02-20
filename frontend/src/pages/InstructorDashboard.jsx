@@ -116,19 +116,38 @@ const InstructorDashboard = () => {
                     </Card>
                 </TabPane>
                 <TabPane tab="Student Performance" key="2">
-                    <Card title="Detailed Analytics" style={{ borderRadius: 16 }}>
-                        <Table dataSource={performance} columns={[
-                            { title: 'Student', dataIndex: ['studentId', 'name'], key: 'name' },
-                            { title: 'Course', dataIndex: ['courseId', 'title'], key: 'course' },
-                            { title: 'Progress', dataIndex: 'progressPercentage', key: 'progress', render: (p) => <Progress percent={p} size="small" /> },
-                            {
-                                title: 'Score', dataIndex: 'performanceScore', key: 'score', render: (s) => (
-                                    <Tag color={s >= 80 ? 'green' : s >= 50 ? 'orange' : 'red'}>{s}%</Tag>
-                                )
-                            }
-                        ]} />
-                    </Card>
+                    <Row gutter={24}>
+                        <Col xs={24} lg={16}>
+                            <Card title="Performance Analytics" style={{ borderRadius: 16 }}>
+                                <Bar
+                                    data={performance.map(p => ({
+                                        name: p.studentId?.name || 'Unknown',
+                                        score: p.performanceScore
+                                    }))}
+                                    xField="name"
+                                    yField="score"
+                                    seriesField="name"
+                                    legend={false}
+                                    height={300}
+                                />
+                            </Card>
+                        </Col>
+                        <Col xs={24} lg={8}>
+                            <Card title="Recent Activity" style={{ borderRadius: 16 }}>
+                                <Table
+                                    dataSource={performance.slice(0, 5)}
+                                    columns={[
+                                        { title: 'Student', dataIndex: ['studentId', 'name'] },
+                                        { title: 'Score', dataIndex: 'performanceScore' }
+                                    ]}
+                                    pagination={false}
+                                    size="small"
+                                />
+                            </Card>
+                        </Col>
+                    </Row>
                 </TabPane>
+
             </Tabs>
 
             <Modal title={editingCourse ? "Edit Course" : "Create New Course"} open={isModalOpen} onCancel={() => setIsModalOpen(false)} onOk={() => form.submit()}>

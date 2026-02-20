@@ -1,15 +1,16 @@
 import React from 'react';
-import { Form, Input, Button, Card, Select, Typography, message } from 'antd';
+import { Form, Input, Button, Card, Typography, Select, message } from 'antd';
 import { useNavigate, Link } from 'react-router-dom';
 import { UserOutlined, MailOutlined, LockOutlined, RocketOutlined } from '@ant-design/icons';
-import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import api from '../services/api';
 
 const { Title, Text } = Typography;
+const { Option } = Select;
 
 const Register = () => {
     const navigate = useNavigate();
-    const { login, user } = useAuth();
+    const { user } = useAuth();
     const [form] = Form.useForm();
     const [loading, setLoading] = React.useState(false);
 
@@ -23,25 +24,13 @@ const Register = () => {
     const onFinish = async (values) => {
         try {
             setLoading(true);
-            const { data } = await api.post('/auth/register', values);
-            
-            if (!data.token || !data._id) {
-                throw new Error('Invalid response from server');
-            }
-            
-            login(data);
-            form.resetFields();
-            message.success('Registration successful! Redirecting to dashboard...');
-            
-            // Use setTimeout to ensure state updates complete before navigation
-            setTimeout(() => {
-                navigate('/dashboard');
-            }, 500);
+            await api.post('/auth/register', values);
+            message.success('Identity Initialized Successfully');
+            navigate('/login');
         } catch (error) {
             setLoading(false);
-            const errorMessage = error.response?.data?.message || error.message || 'Registration failed. Try again later.';
+            const errorMessage = error.response?.data?.message || 'Initialization failed';
             message.error(errorMessage);
-            console.error('Registration error:', error);
         }
     };
 
@@ -55,19 +44,17 @@ const Register = () => {
             padding: '20px'
         }}>
             <Card
+                className="glass-card"
                 style={{
                     width: '100%',
                     maxWidth: 480,
-                    borderRadius: 20,
-                    boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
-                    border: 'none',
-                    background: 'rgba(255, 255, 255, 0.95)'
+                    borderRadius: 24,
+                    padding: '24px'
                 }}
-                bodyStyle={{ padding: '40px' }}
             >
-                <div style={{ textAlign: 'center', marginBottom: 30 }}>
-                    <Title level={2} style={{ margin: 0, color: '#1d3557', fontWeight: 800 }}>Join the ecosystem</Title>
-                    <Text type="secondary">Create your account to start learning or teaching.</Text>
+                <div style={{ textAlign: 'center', marginBottom: 32 }}>
+                    <Title level={2} style={{ margin: 0, color: '#1d3557' }}>Initialize Identity</Title>
+                    <Text type="secondary">Join the LMS Autonomous Network</Text>
                 </div>
 
                 <Form
@@ -76,40 +63,27 @@ const Register = () => {
                     onFinish={onFinish}
                     layout="vertical"
                     size="large"
-                    autoComplete="off"
                     disabled={loading}
                 >
                     <Form.Item
                         name="name"
-                        rules={[{ required: true, message: 'Your name is required!' }]}
+                        rules={[{ required: true, message: 'Official name required' }]}
                     >
-                        <Input
-                            prefix={<UserOutlined style={{ color: '#bfbfbf' }} />}
-                            placeholder="Full Name"
-                            style={{ borderRadius: 8 }}
-                        />
+                        <Input prefix={<UserOutlined />} placeholder="Full Name" />
                     </Form.Item>
 
                     <Form.Item
                         name="email"
-                        rules={[{ required: true, type: 'email', message: 'Enter a valid email!' }]}
+                        rules={[{ required: true, type: 'email', message: 'Valid email required' }]}
                     >
-                        <Input
-                            prefix={<MailOutlined style={{ color: '#bfbfbf' }} />}
-                            placeholder="Email Address"
-                            style={{ borderRadius: 8 }}
-                        />
+                        <Input prefix={<MailOutlined />} placeholder="Email Address" />
                     </Form.Item>
 
                     <Form.Item
                         name="password"
-                        rules={[{ required: true, min: 6, message: 'Password must be at least 6 characters!' }]}
+                        rules={[{ required: true, min: 6, message: 'Security protocol requires 6+ characters' }]}
                     >
-                        <Input.Password
-                            prefix={<LockOutlined style={{ color: '#bfbfbf' }} />}
-                            placeholder="Password"
-                            style={{ borderRadius: 8 }}
-                        />
+                        <Input.Password prefix={<LockOutlined />} placeholder="Password" />
                     </Form.Item>
 
                     <Form.Item
@@ -117,10 +91,9 @@ const Register = () => {
                         initialValue="student"
                         rules={[{ required: true }]}
                     >
-                        <Select style={{ borderRadius: 8 }}>
-                            <Select.Option value="student">Student</Select.Option>
-                            <Select.Option value="instructor">Instructor</Select.Option>
-                            <Select.Option value="admin">Admin</Select.Option>
+                        <Select placeholder="Select Designation">
+                            <Option value="student">Student Participant</Option>
+                            <Option value="instructor">Lead Instructor</Option>
                         </Select>
                     </Form.Item>
 
@@ -131,24 +104,14 @@ const Register = () => {
                             block
                             icon={<RocketOutlined />}
                             loading={loading}
-                            disabled={loading}
-                            style={{
-                                height: 50,
-                                borderRadius: 8,
-                                background: '#e63946',
-                                fontWeight: 600,
-                                fontSize: 16,
-                                border: 'none',
-                                boxShadow: '0 4px 14px 0 rgba(230, 57, 70, 0.39)'
-                            }}
                         >
-                            {loading ? 'Creating Account...' : 'Get Started'}
+                            Initialize
                         </Button>
                     </Form.Item>
 
-                    <div style={{ textAlign: 'center', marginTop: 10 }}>
-                        <Text type="secondary">Already have an account? </Text>
-                        <Link to="/login" style={{ fontWeight: 600, color: '#1d3557' }}>Sign In</Link>
+                    <div style={{ textAlign: 'center', marginTop: 16 }}>
+                        <Text type="secondary">Already Enlisted? </Text>
+                        <Link to="/login" style={{ fontWeight: 600, color: '#1d3557' }}>Access Portal</Link>
                     </div>
                 </Form>
             </Card>

@@ -47,6 +47,8 @@ app.use('/api/quizzes', require('./routes/quizzes'));
 app.use('/api/enrollments', require('./routes/enrollments'));
 app.use('/api/instructor', require('./routes/instructor'));
 app.use('/api/student', require('./routes/student'));
+app.use('/api/admin', require('./routes/admin'));
+
 
 
 console.log('Loaded routes');

@@ -2,6 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
+import LandingPage from './pages/LandingPage';
+
 import Register from './pages/Register';
 import StudentDashboard from './pages/StudentDashboard';
 import InstructorDashboard from './pages/InstructorDashboard';
@@ -25,8 +27,8 @@ function AppRoutes() {
 
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
+      <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register />} />
 
       <Route path="/dashboard" element={
         <ProtectedRoute>
@@ -69,8 +71,9 @@ function AppRoutes() {
         </ProtectedRoute>
       } />
 
-      <Route path="/" element={<Navigate to="/dashboard" />} />
+      <Route path="/" element={<LandingPage />} />
     </Routes>
+
   );
 }
 

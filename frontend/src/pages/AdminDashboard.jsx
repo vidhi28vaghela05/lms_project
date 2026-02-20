@@ -46,9 +46,11 @@ const AdminDashboard = () => {
             setIsSkillModalOpen(false);
             fetchData();
         } catch (error) {
-            message.error('Operation failed');
+            const errorMsg = error.response?.data?.message || 'Operation failed';
+            message.error(errorMsg);
         }
     };
+
 
     const deleteSkill = async (id) => {
         try {
