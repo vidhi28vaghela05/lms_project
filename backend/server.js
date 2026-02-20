@@ -1,18 +1,40 @@
+process.on('uncaughtException', (err) => {
+  console.error('UNCAUGHT EXCEPTION:', err);
+  process.exit(1);
+});
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('UNHANDLED REJECTION:', reason);
+  process.exit(1);
+});
+
 const express = require('express');
+
+const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const path = require('path');
-const connectDB = require('./config/db');
 
 dotenv.config();
 
-// Connect to Database
-connectDB();
-
 const app = express();
 
+// Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Connect to Database
+const connectDB = async () => {
+    try {
+        await mongoose.connect(process.env.MONGO_URI);
+        console.log('MongoDB Connected: ' + mongoose.connection.host);
+    } catch (error) {
+        console.error('MongoDB connection error:', error);
+        process.exit(1);
+    }
+};
+
+connectDB();
 
 console.log('Loaded middleware');
 
@@ -24,11 +46,12 @@ app.use('/api/lessons', require('./routes/lessons'));
 app.use('/api/quizzes', require('./routes/quizzes'));
 app.use('/api/enrollments', require('./routes/enrollments'));
 app.use('/api/instructor', require('./routes/instructor'));
-app.use('/api/admin', require('./routes/admin'));
+app.use('/api/student', require('./routes/student'));
+
 
 console.log('Loaded routes');
 
-// Serve Frontend Static Files
+// Serve Frontend in Production
 const frontendBuildPath = path.join(__dirname, '../frontend/dist');
 app.use(express.static(frontendBuildPath));
 
@@ -39,7 +62,7 @@ app.use((req, res) => {
   }
 });
 
-// Error handling middleware
+// Global Error Handler
 app.use((err, req, res, next) => {
   console.error('ERROR HANDLER:', err);
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
@@ -50,7 +73,6 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3000;
-
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

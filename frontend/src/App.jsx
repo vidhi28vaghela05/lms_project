@@ -8,6 +8,8 @@ import InstructorDashboard from './pages/InstructorDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import LessonViewer from './pages/LessonViewer';
 import QuizPage from './pages/QuizPage';
+import SkillGraphView from './pages/SkillGraphView';
+import MyCourses from './pages/MyCourses';
 import MainLayout from './layouts/MainLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -34,6 +36,22 @@ function AppRoutes() {
         </ProtectedRoute>
       } />
 
+      <Route path="/my-courses" element={
+        <ProtectedRoute role="student">
+          <MainLayout onLogout={logout}>
+            <MyCourses />
+          </MainLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/skill-graph" element={
+        <ProtectedRoute role="student">
+          <MainLayout onLogout={logout}>
+            <SkillGraphView />
+          </MainLayout>
+        </ProtectedRoute>
+      } />
+
       <Route path="/lessons/:courseId" element={
         <ProtectedRoute>
           <MainLayout onLogout={logout}>
@@ -41,6 +59,7 @@ function AppRoutes() {
           </MainLayout>
         </ProtectedRoute>
       } />
+
 
       <Route path="/quiz/:courseId" element={
         <ProtectedRoute>

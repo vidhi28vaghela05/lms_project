@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-const { spawn } = require('child_process');
-const http = require('http');
+const { spawn, exec } = require('child_process');
 const path = require('path');
 const fs = require('fs');
+const net = require('net');
 
 const colors = {
   reset: '\x1b[0m',
@@ -17,41 +17,31 @@ function log(message, color = 'reset') {
   console.log(`${colors[color]}${message}${colors.reset}`);
 }
 
-function checkMongoDBConnection() {
+function checkMongoDB() {
   return new Promise((resolve) => {
-    const data = JSON.stringify({ status: 'check' });
-    const options = {
-      hostname: 'localhost',
-      port: 27017,
-      path: '/',
-      method: 'GET',
-      timeout: 2000
-    };
-
-    const req = http.request(options, () => {
+    const client = new net.Socket();
+    client.setTimeout(2000);
+    client.connect(27017, '127.0.0.1', () => {
+      client.destroy();
       resolve(true);
     });
-
-    req.on('error', () => {
+    client.on('error', () => {
+      client.destroy();
       resolve(false);
     });
-
-    req.on('timeout', () => {
-      req.destroy();
+    client.on('timeout', () => {
+      client.destroy();
       resolve(false);
     });
-
-    req.end();
   });
 }
 
 async function startApplication() {
   try {
-    // Check MongoDB
     log('\n=== LMS Application Startup ===\n', 'cyan');
     log('Checking MongoDB connection...', 'blue');
 
-    const mongoRunning = await checkMongoDBConnection();
+    const mongoRunning = await checkMongoDB();
 
     if (!mongoRunning) {
       log('WARNING: MongoDB is not running!', 'yellow');
@@ -61,38 +51,45 @@ async function startApplication() {
       log('MongoDB is running ✓\n', 'green');
     }
 
-    // Seed database if MongoDB is available
     if (mongoRunning) {
       log('Seeding database with test users...', 'blue');
-      const seedResult = await runSeedDatabase();
-      if (seedResult) {
+      try {
+        await runCommand('node seed.js', path.join(__dirname, 'backend'));
         log('Database seeded ✓\n', 'green');
-      } else {
+      } catch (err) {
         log('Seed completed (or users already exist)\n', 'green');
       }
     }
 
-    // Start backend and frontend concurrently
     log('Starting Backend and Frontend services...', 'blue');
     log('Backend:  http://localhost:3000', 'cyan');
     log('Frontend: http://localhost:5173\n', 'cyan');
 
     const backendProcess = spawn('npm', ['start'], {
-      cwd: path.join(__dirname, '../backend'),
-      stdio: 'inherit'
+      cwd: path.join(__dirname, 'backend'),
+      stdio: 'inherit',
+      shell: true
     });
 
     const frontendProcess = spawn('npm', ['run', 'dev'], {
-      cwd: path.join(__dirname, '../frontend'),
-      stdio: 'inherit'
+      cwd: path.join(__dirname, 'frontend'),
+      stdio: 'inherit',
+      shell: true
     });
 
-    // Wait for backend to start (2 seconds), then open browser
     setTimeout(() => {
-      openBrowser();
-    }, 3000);
+      const url = 'http://localhost:3000';
+      log(`\nOpening browser at ${url}...`, 'green');
+      const startCmd = process.platform === 'win32' ? 'start' : process.platform === 'darwin' ? 'open' : 'xdg-open';
+      exec(`${startCmd} ${url}`);
+      log('\n✅ Application is running!', 'green');
+      log('\nTest Credentials:', 'cyan');
+      log('  Student:    student@lms.com / password123', 'cyan');
+      log('  Instructor: instructor@lms.com / password123', 'cyan');
+      log('  Admin:      admin@lms.com / admin123', 'cyan');
+      log('\nPress Ctrl+C to stop the application\n', 'yellow');
+    }, 5000);
 
-    // Handle process termination
     process.on('SIGINT', () => {
       log('\n\nShutting down services...', 'blue');
       backendProcess.kill();
@@ -106,66 +103,16 @@ async function startApplication() {
   }
 }
 
-function runSeedDatabase() {
-  return new Promise((resolve) => {
-    const seedProcess = spawn('node', ['seed.js'], {
-      cwd: path.join(__dirname, '../backend'),
-      stdio: 'pipe'
+function runCommand(command, cwd) {
+  return new Promise((resolve, reject) => {
+    const parts = command.split(' ');
+    const child = spawn(parts[0], parts.slice(1), { cwd, stdio: 'pipe', shell: true });
+    child.on('close', (code) => {
+      if (code === 0) resolve();
+      else reject(new Error(`Command failed with code ${code}`));
     });
-
-    let output = '';
-    seedProcess.stdout.on('data', (data) => {
-      output += data.toString();
-    });
-
-    seedProcess.stderr.on('data', (data) => {
-      output += data.toString();
-    });
-
-    seedProcess.on('close', (code) => {
-      resolve(code === 0);
-    });
-
-    seedProcess.on('error', () => {
-      resolve(false);
-    });
+    child.on('error', reject);
   });
 }
 
-function openBrowser() {
-  const url = 'http://localhost:3000';
-  log(`\nOpening browser at ${url}...`, 'green');
-
-  const platform = process.platform;
-  let command;
-
-  if (platform === 'darwin') {
-    // macOS
-    command = `open ${url}`;
-  } else if (platform === 'win32') {
-    // Windows
-    command = `start ${url}`;
-  } else {
-    // Linux
-    command = `xdg-open ${url}`;
-  }
-
-  require('child_process').exec(command, (error) => {
-    if (error) {
-      log(`Browser not auto-opened. Please visit ${url} manually`, 'yellow');
-    }
-  });
-
-  log('\n✅ Application is running!', 'green');
-  log('\nTest Credentials:', 'cyan');
-  log('  Student:    student@lms.com / password123', 'cyan');
-  log('  Instructor: instructor@lms.com / password123', 'cyan');
-  log('  Admin:      admin@lms.com / admin123', 'cyan');
-  log('\nPress Ctrl+C to stop the application\n', 'yellow');
-}
-
-// Start the application
-startApplication().catch(error => {
-  log(`Fatal error: ${error.message}`, 'red');
-  process.exit(1);
-});
+startApplication();

@@ -123,10 +123,11 @@ const StudentDashboard = () => {
                 <Col xs={24} md={12}>
                     <Card
                         title="My Courses"
+                        extra={<Button type="link" onClick={() => navigate('/my-courses')}>View All</Button>}
                         style={{ borderRadius: 16, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
                     >
                         <List
-                            dataSource={enrollments}
+                            dataSource={enrollments.slice(0, 3)}
                             renderItem={(item) => (
                                 <List.Item
                                     actions={[
@@ -144,8 +145,14 @@ const StudentDashboard = () => {
                                 </List.Item>
                             )}
                         />
+                        {enrollments.length === 0 && (
+                            <div style={{ textAlign: 'center', padding: 20 }}>
+                                <Text type="secondary">Explore courses to start your journey!</Text>
+                            </div>
+                        )}
                     </Card>
                 </Col>
+
             </Row>
         </div>
     );
