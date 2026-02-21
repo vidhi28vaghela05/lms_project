@@ -11,7 +11,6 @@ const OTPVerification = () => {
     const location = useLocation();
     const [loading, setLoading] = React.useState(false);
     const [resending, setResending] = React.useState(false);
-    const [displayCode, setDisplayCode] = React.useState(location.state?.verificationCode);
     const email = location.state?.email;
 
     React.useEffect(() => {
@@ -36,9 +35,8 @@ const OTPVerification = () => {
     const resendOTP = async () => {
         try {
             setResending(true);
-            const response = await api.post('/auth/resend-otp', { email });
-            setDisplayCode(response.data.verificationCode);
-            message.success('New verification code generated and displayed.');
+            await api.post('/auth/resend-otp', { email });
+            message.success('New OTP sent to your email');
         } catch (error) {
             message.error(error.response?.data?.message || 'Resend failed');
         } finally {
@@ -57,22 +55,7 @@ const OTPVerification = () => {
         }}>
             <Card className="glass-card" style={{ width: '100%', maxWidth: 400, borderRadius: 24, textAlign: 'center' }}>
                 <Title level={2} style={{ color: '#1d3557' }}>Verify Identity</Title>
-                <Text type="secondary">Verification required for {email}</Text>
-
-                {displayCode && (
-                    <div style={{
-                        marginTop: 20,
-                        padding: '16px',
-                        background: 'rgba(230, 57, 70, 0.1)',
-                        border: '2px dashed #e63946',
-                        borderRadius: 12
-                    }}>
-                        <Text strong style={{ color: '#e63946', fontSize: 16 }}>Verification CAPTCHA Code:</Text>
-                        <div style={{ fontSize: 32, fontWeight: 'bold', letterSpacing: 8, color: '#1d3557', marginTop: 8 }}>
-                            {displayCode}
-                        </div>
-                    </div>
-                )}
+                <Text type="secondary">Verification code sent to {email}</Text>
 
                 <Form onFinish={onFinish} layout="vertical" size="large" style={{ marginTop: 24 }}>
                     <Form.Item name="code" rules={[{ required: true, len: 6, message: '6-digit code required' }]}>

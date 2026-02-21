@@ -2,27 +2,62 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const svgCaptcha = require('svg-captcha');
 const { sendOTP, sendResetPasswordLink } = require('../utils/emailService');
 
 const generateToken = (id, role) => {
   return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: '30d' });
 };
 
+// Stateless Captcha: Encrypt text in a JWT-like token
+exports.getCaptcha = (req, res) => {
+  const captcha = svgCaptcha.create({
+    size: 6,
+    noise: 3,
+    color: true,
+    background: '#f0f2f5'
+  });
+  
+  // Create a short-lived token containing the captcha text
+  const captchaToken = jwt.sign(
+    { text: captcha.text.toLowerCase() }, 
+    process.env.JWT_SECRET, 
+    { expiresIn: '5m' }
+  );
+
+  res.json({
+    data: captcha.data, // SVG string
+    token: captchaToken
+  });
+};
+
 exports.registerUser = async (req, res, next) => {
   try {
-    const { name, email, password, role, registrationDescription, upiId } = req.body;
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: 'Please provide name, email, and password' });
+    const { 
+      name, email, password, role, 
+      registrationDescription, upiId, 
+      captcha, captchaToken 
+    } = req.body;
+
+    if (!name || !email || !password || !captcha || !captchaToken) {
+      return res.status(400).json({ message: 'Missing required fields' });
     }
+
+    // Verify Captcha Token
+    try {
+      const decoded = jwt.verify(captchaToken, process.env.JWT_SECRET);
+      if (decoded.text !== captcha.toLowerCase()) {
+        return res.status(400).json({ message: 'Invalid Captcha code' });
+      }
+    } catch (err) {
+      return res.status(400).json({ message: 'Captcha expired, please refresh' });
+    }
+
     const userExists = await User.findOne({ email });
     if (userExists) return res.status(400).json({ message: 'User already exists' });
     
     const hashedPassword = await bcrypt.hash(password, 10);
     
-    // Generate 6-digit OTP
-    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
-
     const user = await User.create({ 
       name, 
       email, 
@@ -30,47 +65,18 @@ exports.registerUser = async (req, res, next) => {
       role,
       registrationDescription,
       upiId,
-      otp: { code: otpCode, expiresAt: otpExpires },
-      isVerified: false
+      isVerified: true // Auto-verify with correct captcha
     });
-
-    await sendOTP(email, otpCode);
 
     console.log('\n======================================');
-    console.log('🚀 NEW USER REGISTRATION');
+    console.log('🚀 NEW USER REGISTERED (CAPTCHA VERIFIED)');
     console.log(`📧 Email: ${email}`);
-    console.log(`🔑 OTP: ${otpCode}`);
+    console.log(`👤 Role: ${role}`);
     console.log('======================================\n');
 
-    res.status(201).json({
-      message: 'Registration successful. Your verification code is provided below.',
-      userId: user._id,
-      verificationCode: otpCode
-    });
-  } catch (error) {
-    console.error('Registration error details:', error);
-    res.status(500).json({ message: error.message || 'Registration failed' });
-  }
-};
-
-exports.verifyOTP = async (req, res) => {
-  try {
-    const { email, code } = req.body;
-    const user = await User.findOne({ email });
-
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    if (user.isVerified) return res.status(400).json({ message: 'User already verified' });
-    
-    if (user.otp.code !== code || user.otp.expiresAt < new Date()) {
-      return res.status(400).json({ message: 'Invalid or expired OTP' });
-    }
-
-    user.isVerified = true;
-    user.otp = undefined;
-    await user.save();
-
     const token = generateToken(user._id, user.role);
-    res.json({
+
+    res.status(201).json({
       _id: user._id,
       name: user.name,
       email: user.email,
@@ -78,47 +84,30 @@ exports.verifyOTP = async (req, res) => {
       token: token
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Registration error details:', error);
+    res.status(500).json({ message: error.message || 'Registration failed' });
   }
 };
 
-exports.resendOTP = async (req, res) => {
-  try {
-    const { email } = req.body;
-    const user = await User.findOne({ email });
-
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    if (user.isVerified) return res.status(400).json({ message: 'User already verified' });
-
-    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
-
-    user.otp = { code: otpCode, expiresAt: otpExpires };
-    await user.save();
-
-    await sendOTP(email, otpCode);
-    
-    console.log('\n======================================');
-    console.log('🔄 OTP RESENT');
-    console.log(`📧 Email: ${email}`);
-    console.log(`🔑 NEW OTP: ${otpCode}`);
-    console.log('======================================\n');
-
-    res.json({ 
-      message: 'New verification code generated.',
-      verificationCode: otpCode 
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+// verifyOTP and resendOTP removed as they are replaced by Captcha-based auto-verification during registration.
 
 exports.loginUser = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      return res.status(400).json({ message: 'Please provide email and password' });
+    const { email, password, captcha, captchaToken, role } = req.body;
+    if (!email || !password || !captcha || !captchaToken) {
+      return res.status(400).json({ message: 'Please provide email, password, and captcha' });
     }
+
+    // Verify Captcha Token
+    try {
+      const decoded = jwt.verify(captchaToken, process.env.JWT_SECRET);
+      if (decoded.text !== captcha.toLowerCase()) {
+        return res.status(400).json({ message: 'Invalid Captcha code' });
+      }
+    } catch (err) {
+      return res.status(400).json({ message: 'Captcha expired, please refresh' });
+    }
+
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({ message: 'Invalid email or password' });
@@ -128,11 +117,8 @@ exports.loginUser = async (req, res, next) => {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    if (!user.isVerified) {
-      return res.status(403).json({ 
-        message: 'Account not verified. Please verify your email.',
-        notVerified: true 
-      });
+    if (user.role !== role) {
+      return res.status(403).json({ message: `Access Denied: You are not registered as a ${role}` });
     }
 
     if (user.role === 'instructor' && user.status !== 'approved') {

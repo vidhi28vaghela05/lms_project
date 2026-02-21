@@ -13,6 +13,21 @@ const Register = () => {
     const { user } = useAuth();
     const [form] = Form.useForm();
     const [loading, setLoading] = React.useState(false);
+    const [captcha, setCaptcha] = React.useState({ data: '', token: '' });
+    const { login } = useAuth();
+
+    const fetchCaptcha = async () => {
+        try {
+            const response = await api.get('/auth/captcha');
+            setCaptcha(response.data);
+        } catch (error) {
+            message.error('Failed to load captcha');
+        }
+    };
+
+    React.useEffect(() => {
+        fetchCaptcha();
+    }, []);
 
     // If already logged in, redirect to dashboard
     React.useEffect(() => {
@@ -24,14 +39,22 @@ const Register = () => {
     const onFinish = async (values) => {
         try {
             setLoading(true);
-            const response = await api.post('/auth/register', values);
-            const { verificationCode, message: successMsg } = response.data;
-            message.success(successMsg);
-            navigate('/verify-otp', { state: { email: values.email, verificationCode } });
+            const submissionData = {
+                ...values,
+                captchaToken: captcha.token
+            };
+            const response = await api.post('/auth/register', submissionData);
+
+            // Auto login after registration
+            login(response.data);
+            message.success('Account initialized successfully!');
+            navigate('/dashboard');
         } catch (error) {
             setLoading(false);
             const errorMessage = error.response?.data?.message || 'Initialization failed';
             message.error(errorMessage);
+            fetchCaptcha(); // Refresh captcha on error
+            form.setFieldsValue({ captcha: '' });
         }
     };
 
@@ -121,6 +144,21 @@ const Register = () => {
                             ) : null
                         }
                     </Form.Item>
+
+                    <div style={{ marginBottom: 20 }}>
+                        <div
+                            dangerouslySetInnerHTML={{ __html: captcha.data }}
+                            onClick={fetchCaptcha}
+                            style={{ cursor: 'pointer', marginBottom: 8, textAlign: 'center', background: '#fff', borderRadius: 8, padding: 4 }}
+                            title="Click to refresh captcha"
+                        />
+                        <Form.Item
+                            name="captcha"
+                            rules={[{ required: true, message: 'Please enter the code shown above' }]}
+                        >
+                            <Input placeholder="Enter Captcha Code" />
+                        </Form.Item>
+                    </div>
 
                     <Form.Item>
                         <Button

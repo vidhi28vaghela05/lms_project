@@ -12,6 +12,20 @@ const Login = () => {
     const { login, user } = useAuth();
     const [form] = Form.useForm();
     const [loading, setLoading] = React.useState(false);
+    const [captcha, setCaptcha] = React.useState({ data: '', token: '' });
+
+    const fetchCaptcha = async () => {
+        try {
+            const response = await api.get('/auth/captcha');
+            setCaptcha(response.data);
+        } catch (error) {
+            message.error('Failed to load captcha');
+        }
+    };
+
+    React.useEffect(() => {
+        fetchCaptcha();
+    }, []);
 
     // If already logged in, redirect to dashboard
     React.useEffect(() => {
@@ -23,7 +37,11 @@ const Login = () => {
     const onFinish = async (values) => {
         try {
             setLoading(true);
-            const { data } = await api.post('/auth/login', values);
+            const submissionData = {
+                ...values,
+                captchaToken: captcha.token
+            };
+            const { data } = await api.post('/auth/login', submissionData);
 
             if (!data.token || !data._id) {
                 throw new Error('Invalid response from server');
@@ -46,10 +64,7 @@ const Login = () => {
         } catch (error) {
             setLoading(false);
             const errData = error.response?.data;
-            if (errData?.notVerified) {
-                message.warning(errData.message);
-                navigate('/verify-otp', { state: { email: values.email } });
-            } else if (errData?.status) {
+            if (errData?.status) {
                 message.info(errData.message);
             } else {
                 message.error(errData?.message || 'Authentication failed');
@@ -103,17 +118,20 @@ const Login = () => {
                         <Input.Password prefix={<LockOutlined />} placeholder="Password" />
                     </Form.Item>
 
-                    <Form.Item
-                        name="role"
-                        initialValue="student"
-                        rules={[{ required: true }]}
-                    >
-                        <Select placeholder="Select Portal">
-                            <Select.Option value="student">Student Participant</Select.Option>
-                            <Select.Option value="instructor">Lead Instructor</Select.Option>
-                            <Select.Option value="admin">System Administrator</Select.Option>
-                        </Select>
-                    </Form.Item>
+                    <div style={{ marginBottom: 20 }}>
+                        <div
+                            dangerouslySetInnerHTML={{ __html: captcha.data }}
+                            onClick={fetchCaptcha}
+                            style={{ cursor: 'pointer', marginBottom: 8, textAlign: 'center', background: '#fff', borderRadius: 8, padding: 4 }}
+                            title="Click to refresh captcha"
+                        />
+                        <Form.Item
+                            name="captcha"
+                            rules={[{ required: true, message: 'Please enter the code shown above' }]}
+                        >
+                            <Input placeholder="Enter Captcha Code" />
+                        </Form.Item>
+                    </div>
 
                     <div style={{ marginBottom: 24, textAlign: 'right' }}>
                         <Link to="/forgot-password" style={{ color: '#1d3557', fontSize: 13 }}>Forgot Password?</Link>
