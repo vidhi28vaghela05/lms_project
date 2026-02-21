@@ -133,6 +133,18 @@ const Login = () => {
                         </Form.Item>
                     </div>
 
+                    <Form.Item
+                        name="role"
+                        initialValue="student"
+                        rules={[{ required: true }]}
+                    >
+                        <Select placeholder="Select Portal">
+                            <Select.Option value="student">Student Participant</Select.Option>
+                            <Select.Option value="instructor">Lead Instructor</Select.Option>
+                            <Select.Option value="admin">System Administrator</Select.Option>
+                        </Select>
+                    </Form.Item>
+
                     <div style={{ marginBottom: 24, textAlign: 'right' }}>
                         <Link to="/forgot-password" style={{ color: '#1d3557', fontSize: 13 }}>Forgot Password?</Link>
                     </div>

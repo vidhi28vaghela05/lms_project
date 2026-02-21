@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Row, Col, Card, Typography, Progress, Table, Tag, Space, Avatar, Button } from 'antd';
+import { Row, Col, Card, Typography, Progress, Table, Tag, Space, Avatar, Button, Tabs } from 'antd';
 import { BookOutlined, RiseOutlined, CheckCircleOutlined, TrophyOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
 const { Title, Text } = Typography;
+const { TabPane } = Tabs;
 
 const StudentDashboard = () => {
     const navigate = useNavigate();
