@@ -3,8 +3,14 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import LandingPage from './pages/LandingPage';
+import AboutUs from './pages/AboutUs';
+import CoursesPage from './pages/CoursesPage';
+import ContactPage from './pages/ContactPage';
 
 import Register from './pages/Register';
+import OTPVerification from './pages/OTPVerification';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import StudentDashboard from './pages/StudentDashboard';
 import InstructorDashboard from './pages/InstructorDashboard';
 import AdminDashboard from './pages/AdminDashboard';
@@ -12,6 +18,8 @@ import LessonViewer from './pages/LessonViewer';
 import QuizPage from './pages/QuizPage';
 import SkillGraphView from './pages/SkillGraphView';
 import MyCourses from './pages/MyCourses';
+import CheckoutPage from './pages/CheckoutPage';
+import PaymentSuccess from './pages/PaymentSuccess';
 import MainLayout from './layouts/MainLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -29,6 +37,9 @@ function AppRoutes() {
     <Routes>
       <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
       <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register />} />
+      <Route path="/verify-otp" element={<OTPVerification />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password/:token" element={<ResetPassword />} />
 
       <Route path="/dashboard" element={
         <ProtectedRoute>
@@ -63,6 +74,22 @@ function AppRoutes() {
       } />
 
 
+      <Route path="/checkout/:courseId" element={
+        <ProtectedRoute>
+          <MainLayout onLogout={logout}>
+            <CheckoutPage />
+          </MainLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/payment-success" element={
+        <ProtectedRoute>
+          <MainLayout onLogout={logout}>
+            <PaymentSuccess />
+          </MainLayout>
+        </ProtectedRoute>
+      } />
+
       <Route path="/quiz/:courseId" element={
         <ProtectedRoute>
           <MainLayout onLogout={logout}>
@@ -71,6 +98,9 @@ function AppRoutes() {
         </ProtectedRoute>
       } />
 
+      <Route path="/about" element={<AboutUs />} />
+      <Route path="/courses" element={<CoursesPage />} />
+      <Route path="/contact" element={<ContactPage />} />
       <Route path="/" element={<LandingPage />} />
     </Routes>
 

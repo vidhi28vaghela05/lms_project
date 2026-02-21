@@ -23,9 +23,9 @@ const Navbar = () => {
 
     const navItems = [
         { key: 'home', label: 'Home', onClick: () => navigate('/') },
-        { key: 'courses', label: 'Courses', onClick: () => document.getElementById('courses')?.scrollIntoView({ behavior: 'smooth' }) },
-        { key: 'about', label: 'About', onClick: () => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }) },
-        { key: 'contact', label: 'Contact', onClick: () => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }) }
+        { key: 'courses', label: 'Courses', onClick: () => navigate('/courses') },
+        { key: 'about', label: 'About', onClick: () => navigate('/about') },
+        { key: 'contact', label: 'Contact', onClick: () => navigate('/contact') }
     ];
 
     const userMenuItems = [
@@ -49,6 +49,10 @@ const Navbar = () => {
         }
     ];
 
+    const isHomePage = location.pathname === '/';
+    const navbarBg = '#1d3557';
+    const logoColor = '#fff';
+
     return (
         <Header
             style={{
@@ -58,12 +62,12 @@ const Navbar = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                background: scrolled ? 'rgba(29, 53, 87, 0.95)' : 'transparent',
-                backdropFilter: scrolled ? 'blur(10px)' : 'none',
+                background: navbarBg,
+                backdropFilter: 'blur(10px)',
                 transition: 'all 0.3s ease',
                 padding: '0 50px',
                 height: scrolled ? '64px' : '80px',
-                borderBottom: scrolled ? '1px solid rgba(255,255,255,0.1)' : 'none'
+                borderBottom: '1px solid rgba(255,255,255,0.1)'
             }}
         >
             <div
@@ -87,23 +91,21 @@ const Navbar = () => {
                 </Title>
             </div>
 
-            {/* Navigation Menu - Only show on landing page */}
-            {location.pathname === '/' && (
-                <Menu
-                    mode="horizontal"
-                    disabledOverflow
-                    items={navItems}
-                    style={{
-                        background: 'transparent',
-                        border: 'none',
-                        minWidth: '400px',
-                        justifyContent: 'center',
-                        color: '#fff',
-                        flex: 1
-                    }}
-                    theme="dark"
-                />
-            )}
+            {/* Navigation Menu - Show on all pages */}
+            <Menu
+                mode="horizontal"
+                disabledOverflow
+                items={navItems}
+                style={{
+                    background: 'transparent',
+                    border: 'none',
+                    minWidth: '400px',
+                    justifyContent: 'center',
+                    color: '#fff',
+                    flex: 1
+                }}
+                theme="dark"
+            />
 
             <Space size="middle">
                 {user ? (

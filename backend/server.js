@@ -8,15 +8,24 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
 
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const path = require('path');
 
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
 
 // Middleware
 app.use(cors());
@@ -48,6 +57,7 @@ app.use('/api/enrollments', require('./routes/enrollments'));
 app.use('/api/instructor', require('./routes/instructor'));
 app.use('/api/student', require('./routes/student'));
 app.use('/api/admin', require('./routes/admin'));
+app.use('/api/payments', require('./routes/payments'));
 
 
 
@@ -74,7 +84,38 @@ app.use((err, req, res, next) => {
   });
 });
 
+// Socket.io Logic
+const Message = require('./models/Message');
+
+io.on('connection', (socket) => {
+  console.log('User connected:', socket.id);
+
+  socket.on('register', (userId) => {
+    socket.join(userId);
+    console.log(`User ${userId} registered in socket room`);
+  });
+
+  socket.on('sendMessage', async (data) => {
+    const { senderId, receiverId, text } = data;
+    const newMessage = await Message.create({ 
+      sender: senderId, 
+      receiver: receiverId, 
+      message: text 
+    });
+    io.to(receiverId).emit('receiveMessage', {
+      senderId,
+      receiverId,
+      text,
+      createdAt: newMessage.createdAt
+    });
+  });
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected');
+  });
+});
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

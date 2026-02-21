@@ -38,6 +38,7 @@ const { Title, Text, Paragraph } = Typography;
 
 const LandingPage = () => {
     const navigate = useNavigate();
+    console.log('LandingPage rendering...');
 
     const stats = [
         { label: '10K+', desc: 'Active Learners' },
@@ -234,8 +235,7 @@ const LandingPage = () => {
                             textAlign: 'center',
                             color: 'white',
                             position: 'relative',
-                            overflow: 'hidden',
-                            marginTop: 80
+                            overflow: 'hidden'
                         }}
                     >
                         <div
@@ -317,7 +317,7 @@ const LandingPage = () => {
                                 <Button
                                     type="default"
                                     size="large"
-                                    onClick={() => document.getElementById('courses')?.scrollIntoView({ behavior: 'smooth' })}
+                                    onClick={() => navigate('/courses')}
                                     style={{
                                         height: 55,
                                         padding: '0 40px',
@@ -412,78 +412,6 @@ const LandingPage = () => {
                         </Row>
                     </section>
 
-                    {/* ============ COURSES SECTION ============ */}
-                    <section id="courses" style={{ padding: '100px 50px', background: '#f8f9fa' }}>
-                        <div style={{ textAlign: 'center', marginBottom: 60, maxWidth: 1200, margin: '0 auto' }}>
-                            <Tag color="error">POPULAR COURSES</Tag>
-                            <Title level={2} style={{ marginTop: 16 }}>
-                                Start with Our Best Courses
-                            </Title>
-                        </div>
-
-                        <Row gutter={[32, 32]} style={{ maxWidth: 1200, margin: '0 auto' }}>
-                            {courses.map((course, idx) => (
-                                <Col xs={24} md={8} key={idx}>
-                                    <Card
-                                        bordered={false}
-                                        hoverable
-                                        style={{
-                                            borderRadius: '20px',
-                                            overflow: 'hidden',
-                                            boxShadow: '0 4px 16px rgba(0,0,0,0.05)',
-                                            transition: 'all 0.3s ease'
-                                        }}
-                                    >
-                                        <div
-                                            style={{
-                                                height: '200px',
-                                                background: `linear-gradient(135deg, #e63946, #457b9d)`,
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                color: '#fff',
-                                                fontSize: '60px',
-                                                marginBottom: 20
-                                            }}
-                                        >
-                                            <BookOutlined />
-                                        </div>
-
-                                        {course.badge && (
-                                            <Tag color="error" style={{ position: 'absolute', top: 16, right: 16 }}>
-                                                {course.badge}
-                                            </Tag>
-                                        )}
-
-                                        <Title level={4} style={{ marginBottom: 8 }}>
-                                            {course.title}
-                                        </Title>
-
-                                        <Space direction="vertical" style={{ width: '100%', marginBottom: 16 }}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                <Text type="secondary">by {course.instructor}</Text>
-                                                <Rate disabled value={course.rating} style={{ fontSize: 14 }} />
-                                            </div>
-                                            <Text type="secondary">{course.students} students</Text>
-                                        </Space>
-
-                                        <div style={{
-                                            display: 'flex',
-                                            justifyContent: 'space-between',
-                                            alignItems: 'center',
-                                            paddingTop: 16,
-                                            borderTop: '1px solid #f0f0f0'
-                                        }}>
-                                            <Title level={4} style={{ margin: 0, color: '#e63946' }}>
-                                                {course.price}
-                                            </Title>
-                                            <Button type="primary">Enroll</Button>
-                                        </div>
-                                    </Card>
-                                </Col>
-                            ))}
-                        </Row>
-                    </section>
 
                     {/* ============ TESTIMONIALS SECTION ============ */}
                     <section style={{ padding: '100px 50px', background: '#fff' }}>
@@ -685,92 +613,7 @@ const LandingPage = () => {
                         </div>
                     </section>
 
-                    {/* ============ ABOUT SECTION ============ */}
-                    <section style={{ padding: '100px 50px', background: '#fff' }}>
-                        <Row gutter={[60, 60]} align="middle" style={{ maxWidth: 1200, margin: '0 auto' }}>
-                            <Col xs={24} md={12}>
-                                <div
-                                    style={{
-                                        background: 'linear-gradient(135deg, #1d3557, #457b9d)',
-                                        borderRadius: '20px',
-                                        height: '400px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        color: '#fff',
-                                        boxShadow: '0 20px 60px rgba(0,0,0,0.1)',
-                                        fontSize: '100px'
-                                    }}
-                                >
-                                    🚀
-                                </div>
-                            </Col>
-                            <Col xs={24} md={12}>
-                                <Tag color="blue">ABOUT US</Tag>
-                                <Title level={2} style={{ marginTop: 16 }}>
-                                    The Future of Online Learning
-                                </Title>
-                                <Paragraph style={{ fontSize: '16px', color: '#666', marginBottom: 24 }}>
-                                    LMS 3.0 is built on the conviction that education should be accessible, personalized, and engaging. We combine cutting-edge AI technology with proven pedagogical methods to create the most effective learning experience.
-                                </Paragraph>
-                                <Paragraph style={{ fontSize: '16px', color: '#666', marginBottom: 32 }}>
-                                    Our mission is to empower learners worldwide to master in-demand skills, accelerate their careers, and achieve their dreams.
-                                </Paragraph>
 
-                                <Space direction="vertical" style={{ width: '100%', fontSize: '16px' }}>
-                                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                                        <CheckCircleOutlined style={{ color: '#e63946', fontSize: 20 }} />
-                                        <Text>Trusted by 10K+ learners worldwide</Text>
-                                    </div>
-                                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                                        <CheckCircleOutlined style={{ color: '#e63946', fontSize: 20 }} />
-                                        <Text>50+ experienced instructors</Text>
-                                    </div>
-                                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                                        <CheckCircleOutlined style={{ color: '#e63946', fontSize: 20 }} />
-                                        <Text>Industry-recognized certificates</Text>
-                                    </div>
-                                </Space>
-                            </Col>
-                        </Row>
-                    </section>
-
-                    {/* ============ CONTACT SECTION ============ */}
-                    <section id="contact" style={{ padding: '100px 50px', background: '#f8f9fa' }}>
-                        <div style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
-                            <PhoneOutlined style={{ fontSize: 48, color: '#e63946', marginBottom: 24 }} />
-                            <Title level={2}>Get in Touch</Title>
-                            <Paragraph style={{ fontSize: '18px', color: '#666', marginBottom: 32 }}>
-                                Have questions? Our support team is here to help. Reach out to us anytime.
-                            </Paragraph>
-                            <Space size="large">
-                                <Button
-                                    type="primary"
-                                    size="large"
-                                    style={{
-                                        height: 50,
-                                        padding: '0 40px',
-                                        borderRadius: '12px',
-                                        fontWeight: 700
-                                    }}
-                                >
-                                    📧 Email Us
-                                </Button>
-                                <Button
-                                    type="default"
-                                    size="large"
-                                    style={{
-                                        height: 50,
-                                        padding: '0 40px',
-                                        borderRadius: '12px',
-                                        fontWeight: 700
-                                    }}
-                                >
-                                    💬 Chat Support
-                                </Button>
-                            </Space>
-                        </div>
-                    </section>
                 </Content>
 
                 {/* ============ FOOTER ============ */}

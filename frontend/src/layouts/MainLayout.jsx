@@ -10,6 +10,7 @@ import {
     DashboardOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
+import LiveSupport from '../components/LiveSupport';
 
 const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
@@ -26,7 +27,7 @@ const MainLayout = ({ children, onLogout }) => {
 
     const handleLogout = () => {
         onLogout();
-        navigate('/login');
+        navigate('/');
     };
 
     const getMenuItems = () => {
@@ -128,9 +129,9 @@ const MainLayout = ({ children, onLogout }) => {
                         boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
                     }}
                 >
-                    {children}
                 </Content>
             </Layout>
+            <LiveSupport />
         </Layout>
     );
 };

@@ -12,7 +12,11 @@ exports.createQuiz = async (req, res) => {
 
 exports.getQuizzesByCourse = async (req, res) => {
   try {
-    const quizzes = await Quiz.find({ courseId: req.params.courseId });
+    const { lessonId } = req.query;
+    const filter = { courseId: req.params.courseId };
+    if (lessonId) filter.lessonId = lessonId;
+    
+    const quizzes = await Quiz.find(filter);
     res.json(quizzes);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -21,15 +25,18 @@ exports.getQuizzesByCourse = async (req, res) => {
 
 exports.submitQuiz = async (req, res) => {
   try {
-    const { answers, courseId } = req.body;
-    const quizzes = await Quiz.find({ courseId });
+    const { answers, courseId, lessonId } = req.body;
+    const filter = { courseId };
+    if (lessonId) filter.lessonId = lessonId;
+    
+    const quizzes = await Quiz.find(filter);
     let score = 0;
     
     quizzes.forEach((q, index) => {
       if (answers[index] === q.correctAnswer) score++;
     });
 
-    const percentage = (score / quizzes.length) * 100;
+    const percentage = quizzes.length > 0 ? (score / quizzes.length) * 100 : 0;
     
     let recommendations = [];
     let unlocked = [];

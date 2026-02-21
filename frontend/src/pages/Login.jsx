@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Input, Button, Card, Typography, message } from 'antd';
+import { Form, Input, Button, Card, Typography, Select, message } from 'antd';
 import { useNavigate, Link } from 'react-router-dom';
 import { MailOutlined, LockOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import api from '../services/api';
@@ -29,6 +29,12 @@ const Login = () => {
                 throw new Error('Invalid response from server');
             }
 
+            if (data.role !== values.role) {
+                setLoading(false);
+                message.error(`Access Denied: You are not registered as a ${values.role}`);
+                return;
+            }
+
             login(data);
             form.resetFields();
             message.success('Welcome to the LMS Ecosystem');
@@ -39,8 +45,15 @@ const Login = () => {
             }, 500);
         } catch (error) {
             setLoading(false);
-            const errorMessage = error.response?.data?.message || error.message || 'Authentication failed';
-            message.error(errorMessage);
+            const errData = error.response?.data;
+            if (errData?.notVerified) {
+                message.warning(errData.message);
+                navigate('/verify-otp', { state: { email: values.email } });
+            } else if (errData?.status) {
+                message.info(errData.message);
+            } else {
+                message.error(errData?.message || 'Authentication failed');
+            }
             console.error('Login error:', error);
         }
     };
@@ -89,6 +102,22 @@ const Login = () => {
                     >
                         <Input.Password prefix={<LockOutlined />} placeholder="Password" />
                     </Form.Item>
+
+                    <Form.Item
+                        name="role"
+                        initialValue="student"
+                        rules={[{ required: true }]}
+                    >
+                        <Select placeholder="Select Portal">
+                            <Select.Option value="student">Student Participant</Select.Option>
+                            <Select.Option value="instructor">Lead Instructor</Select.Option>
+                            <Select.Option value="admin">System Administrator</Select.Option>
+                        </Select>
+                    </Form.Item>
+
+                    <div style={{ marginBottom: 24, textAlign: 'right' }}>
+                        <Link to="/forgot-password" style={{ color: '#1d3557', fontSize: 13 }}>Forgot Password?</Link>
+                    </div>
 
                     <Form.Item>
                         <Button

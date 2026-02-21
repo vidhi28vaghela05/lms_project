@@ -1,11 +1,19 @@
 const express = require('express');
-const { createCourse, getCourses, getCourseById, updateCourse, deleteCourse } = require('../controllers/courseController');
+const {
+  createCourse,
+  getCourses,
+  getCourseById,
+  updateCourse,
+  deleteCourse,
+  getPopularCourses
+} = require('../controllers/courseController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 const router = express.Router();
 
-router.route('/')
-  .get(getCourses)
-  .post(protect, authorize('instructor', 'admin'), createCourse);
+router.get('/', getCourses);
+router.post('/', protect, authorize('instructor', 'admin'), createCourse);
+
+router.get('/popular', getPopularCourses);
 
 router.route('/:id')
   .get(getCourseById)

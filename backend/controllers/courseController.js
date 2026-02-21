@@ -1,4 +1,6 @@
 const Course = require('../models/Course');
+const Enrollment = require('../models/Enrollment');
+const mongoose = require('mongoose');
 
 exports.createCourse = async (req, res) => {
   try {
@@ -20,7 +22,59 @@ exports.createCourse = async (req, res) => {
 
 exports.getCourses = async (req, res) => {
   try {
-    const courses = await Course.find({}).populate('instructorId', 'name email');
+    const { keyword, level, minPrice, maxPrice, skills } = req.query;
+    let query = { isApproved: true };
+
+    if (keyword) {
+      query.$or = [
+        { title: { $regex: keyword, $options: 'i' } },
+        { description: { $regex: keyword, $options: 'i' } }
+      ];
+    }
+
+    if (level) query.level = level;
+    
+    if (minPrice || maxPrice) {
+      query.price = {};
+      if (minPrice) query.price.$gte = Number(minPrice);
+      if (maxPrice) query.price.$lte = Number(maxPrice);
+    }
+
+    if (skills) {
+      const skillsArray = skills.split(',');
+      query.skillsCovered = { $in: skillsArray };
+    }
+
+    // Admins can see non-approved courses
+    if (req.user && req.user.role === 'admin') {
+      delete query.isApproved;
+    }
+
+    const courses = await Course.find(query).populate('instructorId', 'name email');
+    res.json(courses);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getPopularCourses = async (req, res) => {
+  try {
+    // Top 10 by enrollment count
+    const popularData = await Enrollment.aggregate([
+      { $group: { _id: "$courseId", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 10 }
+    ]);
+
+    const courseIds = popularData.map(p => p._id);
+    const courses = await Course.find({ _id: { $in: courseIds }, isApproved: true })
+      .populate('instructorId', 'name email');
+    
+    // Tag them in DB if needed (optional, but requested "popular tag for top 10")
+    // We can just return them with a flag or update the DB
+    await Course.updateMany({ _id: { $in: courseIds } }, { isPopular: true });
+    await Course.updateMany({ _id: { $nin: courseIds } }, { isPopular: false });
+
     res.json(courses);
   } catch (error) {
     res.status(500).json({ message: error.message });

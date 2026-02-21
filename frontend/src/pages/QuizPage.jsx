@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Card, Radio, Button, Typography, Space, Progress, message, Result } from 'antd';
 import api from '../services/api';
 
@@ -8,6 +8,8 @@ const { Title, Text } = Typography;
 const QuizPage = () => {
     const { courseId } = useParams();
     const navigate = useNavigate();
+    const { state } = useLocation();
+    const lessonId = state?.lessonId;
     const [quizzes, setQuizzes] = useState([]);
     const [currentIdx, setCurrentIdx] = useState(0);
     const [answers, setAnswers] = useState([]);
@@ -17,7 +19,9 @@ const QuizPage = () => {
     useEffect(() => {
         const fetchQuizzes = async () => {
             try {
-                const res = await api.get(`/quizzes/course/${courseId}`);
+                const res = await api.get(`/quizzes/course/${courseId}`, {
+                    params: { lessonId }
+                });
                 setQuizzes(res.data);
             } catch (error) {
                 message.error('Failed to load quiz');
@@ -26,7 +30,7 @@ const QuizPage = () => {
             }
         };
         fetchQuizzes();
-    }, [courseId]);
+    }, [courseId, lessonId]);
 
     const handleAnswer = (e) => {
         const newAnswers = [...answers];
@@ -36,16 +40,19 @@ const QuizPage = () => {
 
     const handleSubmit = async () => {
         try {
-            const res = await api.post('/quizzes/submit', { answers, courseId });
+            const res = await api.post('/quizzes/submit', {
+                answers,
+                courseId,
+                lessonId
+            });
             setResult(res.data);
             if (res.data.passed) {
-                message.success('Congratulations! You passed the quiz.');
-                // Potentially update enrollment here
+                message.success('Cognitive Lock Released: Access Granted');
             } else {
-                message.warning('You did not pass. Review the lessons and try again.');
+                message.warning('Interference Detected: Insufficient Precision');
             }
         } catch (error) {
-            message.error('Failed to submit quiz');
+            message.error('Signal Interrupted during submission');
         }
     };
 

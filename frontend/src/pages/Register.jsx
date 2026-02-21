@@ -24,9 +24,10 @@ const Register = () => {
     const onFinish = async (values) => {
         try {
             setLoading(true);
-            await api.post('/auth/register', values);
-            message.success('Identity Initialized Successfully');
-            navigate('/login');
+            const response = await api.post('/auth/register', values);
+            const { verificationCode, message: successMsg } = response.data;
+            message.success(successMsg);
+            navigate('/verify-otp', { state: { email: values.email, verificationCode } });
         } catch (error) {
             setLoading(false);
             const errorMessage = error.response?.data?.message || 'Initialization failed';
@@ -94,7 +95,31 @@ const Register = () => {
                         <Select placeholder="Select Designation">
                             <Option value="student">Student Participant</Option>
                             <Option value="instructor">Lead Instructor</Option>
+                            <Option value="admin">System Administrator</Option>
                         </Select>
+                    </Form.Item>
+
+                    <Form.Item noStyle shouldUpdate={(prevValues, currentValues) => prevValues.role !== currentValues.role}>
+                        {({ getFieldValue }) =>
+                            getFieldValue('role') === 'instructor' ? (
+                                <>
+                                    <Form.Item
+                                        name="registrationDescription"
+                                        label="Professional Background"
+                                        rules={[{ required: true, message: 'Please describe your expertise' }]}
+                                    >
+                                        <Input.TextArea placeholder="Describe your teaching experience and skills..." rows={4} />
+                                    </Form.Item>
+                                    <Form.Item
+                                        name="upiId"
+                                        label="Payment ID (UPI)"
+                                        rules={[{ required: true, message: 'UPI ID required for payouts' }]}
+                                    >
+                                        <Input placeholder="e.g. yourname@okaxis" />
+                                    </Form.Item>
+                                </>
+                            ) : null
+                        }
                     </Form.Item>
 
                     <Form.Item>

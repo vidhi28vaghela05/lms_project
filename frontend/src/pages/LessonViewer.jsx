@@ -12,6 +12,7 @@ const LessonViewer = () => {
     const [lessons, setLessons] = useState([]);
     const [currentLesson, setCurrentLesson] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [completedLessons, setCompletedLessons] = useState([]);
 
     useEffect(() => {
         const fetchLessons = async () => {
@@ -19,6 +20,13 @@ const LessonViewer = () => {
                 const res = await api.get(`/lessons/course/${courseId}`);
                 setLessons(res.data);
                 if (res.data.length > 0) setCurrentLesson(res.data[0]);
+
+                // Fetch enrollment status and progress
+                const enrollRes = await api.get('/student/my-courses');
+                const enrollment = enrollRes.data.find(e => e.courseId._id === courseId);
+                if (enrollment) {
+                    setCompletedLessons(enrollment.completedLessons || []);
+                }
             } catch (error) {
                 message.error('Failed to load lessons');
             } finally {
@@ -46,7 +54,7 @@ const LessonViewer = () => {
                             }}
                         >
                             <Space>
-                                <PlayCircleOutlined />
+                                {completedLessons.includes(item._id) ? <CheckCircleOutlined style={{ color: '#52c41a' }} /> : <PlayCircleOutlined />}
                                 <Text strong={currentLesson?._id === item._id}>{item.title}</Text>
                             </Space>
                         </List.Item>
@@ -70,10 +78,42 @@ const LessonViewer = () => {
                             <Title level={4}>Lesson Content</Title>
                             <Paragraph>{currentLesson.content}</Paragraph>
                         </Card>
-                        <div style={{ marginTop: 32, textAlign: 'right' }}>
-                            <Button type="primary" size="large" icon={<ArrowRightOutlined />}>
-                                Next Lesson
+                        <div style={{ marginTop: 32, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <Button
+                                type={completedLessons.includes(currentLesson._id) ? "default" : "primary"}
+                                icon={<CheckCircleOutlined />}
+                                onClick={async () => {
+                                    try {
+                                        await api.post('/student/progress', {
+                                            courseId,
+                                            lessonId: currentLesson._id,
+                                            completed: !completedLessons.includes(currentLesson._id)
+                                        });
+                                        setCompletedLessons(prev =>
+                                            prev.includes(currentLesson._id)
+                                                ? prev.filter(id => id !== currentLesson._id)
+                                                : [...prev, currentLesson._id]
+                                        );
+                                        message.success('Pulse updated');
+                                    } catch (error) {
+                                        message.error('Progression sync failed');
+                                    }
+                                }}
+                            >
+                                {completedLessons.includes(currentLesson._id) ? "Lesson Mastered" : "Initialize Completion"}
                             </Button>
+
+                            <Space>
+                                <Button ghost type="primary" onClick={() => navigate(`/quiz/${courseId}`, { state: { lessonId: currentLesson._id } })}>
+                                    Attempt Lesson Quiz
+                                </Button>
+                                <Button type="primary" icon={<ArrowRightOutlined />} onClick={() => {
+                                    const nextIdx = lessons.findIndex(l => l._id === currentLesson._id) + 1;
+                                    if (nextIdx < lessons.length) setCurrentLesson(lessons[nextIdx]);
+                                }}>
+                                    Next Module
+                                </Button>
+                            </Space>
                         </div>
                     </div>
                 ) : (

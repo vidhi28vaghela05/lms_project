@@ -10,7 +10,16 @@ const AdminDashboard = () => {
     const [users, setUsers] = useState([]);
     const [courses, setCourses] = useState([]);
     const [skills, setSkills] = useState([]);
-    const [stats, setStats] = useState({ totalUsers: 0, totalCourses: 0, engagementRate: 0 });
+    const [stats, setStats] = useState({
+        totalUsers: 0,
+        totalCourses: 0,
+        totalInstructors: 0,
+        todayIncome: 0,
+        monthIncome: 0
+    });
+    const [pendingInstructors, setPendingInstructors] = useState([]);
+    const [pendingCourses, setPendingCourses] = useState([]);
+    const [pendingPayments, setPendingPayments] = useState([]);
     const [isSkillModalOpen, setIsSkillModalOpen] = useState(false);
     const [editingSkill, setEditingSkill] = useState(null);
     const [skillForm] = Form.useForm();
@@ -25,6 +34,16 @@ const AdminDashboard = () => {
             setSkills(skillRes.data);
             const statsRes = await api.get('/admin/analytics');
             setStats(statsRes.data);
+
+            // Filter pending data from fetched users/courses
+            setPendingInstructors(userRes.data.filter(u => u.role === 'instructor' && u.status === 'pending'));
+
+            // For courses, we need a separate endpoint or just filter here if courseRes has isApproved
+            setPendingCourses(courseRes.data.filter(c => !c.isApproved || (c.updateRequest && c.updateRequest.status === 'pending')));
+
+            // In a real app, you'd fetch pending payments separately
+            // const paymentRes = await api.get('/admin/pending-payments');
+            // setPendingPayments(paymentRes.data);
         } catch (error) {
             console.error('Error fetching admin data', error);
         }
@@ -52,13 +71,33 @@ const AdminDashboard = () => {
     };
 
 
-    const deleteSkill = async (id) => {
+    const approveInstructor = async (userId) => {
         try {
-            await api.delete(`/skills/${id}`);
-            message.success('Skill deleted');
+            await api.post('/admin/approve-instructor', { userId, status: 'approved' });
+            message.success('Instructor approved');
             fetchData();
         } catch (error) {
-            message.error('Delete failed');
+            message.error('Approval failed');
+        }
+    };
+
+    const approveCourse = async (courseId) => {
+        try {
+            await api.post(`/admin/approve-course/${courseId}`);
+            message.success('Course approved');
+            fetchData();
+        } catch (error) {
+            message.error('Approval failed');
+        }
+    };
+
+    const handleUpdate = async (courseId, action) => {
+        try {
+            await api.post('/admin/course-update', { courseId, action });
+            message.success(`Update request ${action}ed`);
+            fetchData();
+        } catch (error) {
+            message.error('Operation failed');
         }
     };
 
@@ -115,30 +154,70 @@ const AdminDashboard = () => {
                         <Statistic title="Courses" value={stats.totalCourses} prefix={<AppstoreOutlined />} />
                     </Card>
                 </Col>
-                <Col xs={12} sm={6}>
-                    <Card bordered={false} style={{ borderRadius: 16, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-                        <Statistic title="Engagement" value={stats.engagementRate} suffix="%" prefix={<GlobalOutlined />} />
+                <Col xs={24} sm={8}>
+                    <Card bordered={false} className="glass-card" style={{ borderRadius: 16 }}>
+                        <Statistic title="Today's Platform Revenue" value={stats.todayIncome} prefix="$" valueStyle={{ color: '#3f8600' }} />
+                    </Card>
+                </Col>
+                <Col xs={24} sm={8}>
+                    <Card bordered={false} className="glass-card" style={{ borderRadius: 16 }}>
+                        <Statistic title="Monthly Platform Revenue" value={stats.monthIncome} prefix="$" valueStyle={{ color: '#1d3557' }} />
                     </Card>
                 </Col>
             </Row>
 
-            <Tabs defaultActiveKey="1">
-                <TabPane tab="Users" key="1">
-                    <Card title="User Management" style={{ borderRadius: 16 }}>
-                        <Table dataSource={users} columns={userColumns} rowKey="_id" />
+            <Tabs defaultActiveKey="1" className="custom-tabs">
+                <TabPane tab="Instructors Vetting" key="1">
+                    <Card title="Pending Instructor Approvals" style={{ borderRadius: 16 }}>
+                        <Table
+                            dataSource={pendingInstructors}
+                            columns={[
+                                ...userColumns,
+                                {
+                                    title: 'Bio/Request',
+                                    dataIndex: 'registrationDescription',
+                                    key: 'bio',
+                                    ellipsis: true
+                                },
+                                {
+                                    title: 'Actions',
+                                    key: 'actions',
+                                    render: (_, record) => (
+                                        <Space>
+                                            <Button type="primary" onClick={() => approveInstructor(record._id)}>Approve</Button>
+                                            <Button danger onClick={() => api.post('/admin/approve-instructor', { userId: record._id, status: 'rejected' }).then(fetchData)}>Reject</Button>
+                                        </Space>
+                                    )
+                                }
+                            ]}
+                            rowKey="_id"
+                        />
                     </Card>
                 </TabPane>
-                <TabPane tab="Courses" key="2">
-                    <Card title="Universal Course Management" style={{ borderRadius: 16 }}>
-                        <Table dataSource={courses} columns={[
+                <TabPane tab="Course Approvals" key="2">
+                    <Card title="New Courses & Update Requests" style={{ borderRadius: 16 }}>
+                        <Table dataSource={pendingCourses} columns={[
                             { title: 'Title', dataIndex: 'title', key: 'title' },
                             { title: 'Instructor', dataIndex: ['instructorId', 'name'], key: 'instructor' },
-                            { title: 'Status', dataIndex: 'status', key: 'status' },
                             {
-                                title: 'Actions', key: 'actions', render: (_, record) => (
-                                    <Popconfirm title="Delete Course?" onConfirm={() => deleteCourse(record._id)}>
-                                        <Button icon={<DeleteOutlined />} danger size="small" />
-                                    </Popconfirm>
+                                title: 'Type',
+                                key: 'type',
+                                render: (_, record) => !record.isApproved ? <Tag color="orange">NEW COURSE</Tag> : <Tag color="purple">UPDATE REQ</Tag>
+                            },
+                            {
+                                title: 'Actions',
+                                key: 'actions',
+                                render: (_, record) => (
+                                    <Space>
+                                        {!record.isApproved ? (
+                                            <Button type="primary" size="small" onClick={() => approveCourse(record._id)}>Approve New</Button>
+                                        ) : (
+                                            <>
+                                                <Button type="primary" size="small" onClick={() => handleUpdate(record._id, 'approve')}>Approve Update</Button>
+                                                <Button danger size="small" onClick={() => handleUpdate(record._id, 'reject')}>Reject Update</Button>
+                                            </>
+                                        )}
+                                    </Space>
                                 )
                             }
                         ]} rowKey="_id" />

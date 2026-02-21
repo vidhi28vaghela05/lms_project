@@ -7,7 +7,31 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   role: { type: String, enum: ['student', 'instructor', 'admin'], default: 'student' },
   skills: { type: [String], default: [] },
-  progressScore: { type: Number, default: 0 }
+  progressScore: { type: Number, default: 0 },
+  
+  // Auth & Verification
+  isVerified: { type: Boolean, default: false },
+  otp: {
+    code: String,
+    expiresAt: Date
+  },
+  resetPasswordToken: String,
+  resetPasswordExpires: Date,
+
+  // Instructor Specifics
+  status: { 
+    type: String, 
+    enum: ['pending', 'approved', 'rejected'], 
+    default: function() {
+      return this.role === 'instructor' ? 'pending' : 'approved';
+    }
+  },
+  registrationDescription: String,
+  upiId: String,
+  payableAmount: { type: Number, default: 0 },
+
+  // Student Specifics
+  wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }]
 }, { timestamps: true });
 
 userSchema.methods.comparePassword = async function(candidatePassword) {

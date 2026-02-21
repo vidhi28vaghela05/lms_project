@@ -14,13 +14,16 @@ const StudentDashboard = () => {
         inProgress: 0,
         avgScore: 0
     });
+    const [wishlist, setWishlist] = useState([]);
 
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                const { data } = await api.get('/student/dashboard');
-                setCourses(data.courses || []);
-                setStats(data.stats || { completed: 0, inProgress: 0, avgScore: 0 });
+                const { data } = await api.get('/student/my-courses');
+                setCourses(data || []);
+                // For stats, we might need a separate call or calculate here
+                const wishRes = await api.get('/student/wishlist');
+                setWishlist(wishRes.data);
             } catch (error) {
                 console.error('Failed to fetch student dashboard data', error);
             }
@@ -60,13 +63,27 @@ const StudentDashboard = () => {
             title: 'Action',
             key: 'action',
             render: (_, record) => (
-                <Button
-                    type="link"
-                    icon={<PlayCircleOutlined />}
-                    onClick={() => navigate(`/lessons/${record._id}`)}
-                >
-                    Resume
-                </Button>
+                <Space>
+                    <Button
+                        type="link"
+                        icon={<PlayCircleOutlined />}
+                        onClick={() => navigate(`/lessons/${record.courseId._id}`)}
+                    >
+                        Resume
+                    </Button>
+                    {(record.progressPercentage >= 100) && (
+                        <Button
+                            type="primary"
+                            size="small"
+                            icon={<TrophyOutlined />}
+                            onClick={() => api.get(`/student/certificate/${record.courseId._id}`).then(res => {
+                                window.open(res.data.pdfUrl || '#', '_blank');
+                            })}
+                        >
+                            Certificate
+                        </Button>
+                    )}
+                </Space>
             )
         }
     ];
@@ -108,14 +125,34 @@ const StudentDashboard = () => {
                 </Col>
             </Row>
 
-            <Card className="glass-card" title={<Title level={4} style={{ margin: 0 }}>Current Enlistments</Title>}>
-                <Table
-                    columns={columns}
-                    dataSource={courses}
-                    rowKey="_id"
-                    pagination={false}
-                />
-            </Card>
+            <Tabs defaultActiveKey="1" style={{ marginTop: 24 }}>
+                <TabPane tab="My Enlistments" key="1">
+                    <Card className="glass-card">
+                        <Table
+                            columns={columns}
+                            dataSource={courses}
+                            rowKey="_id"
+                            pagination={false}
+                        />
+                    </Card>
+                </TabPane>
+                <TabPane tab="Vanguard Wishlist" key="2">
+                    <Card className="glass-card">
+                        <Table
+                            dataSource={wishlist}
+                            columns={[
+                                { title: 'Course', dataIndex: 'title' },
+                                { title: 'Level', dataIndex: 'level' },
+                                {
+                                    title: 'Action',
+                                    render: (_, record) => <Button onClick={() => navigate('/courses')}>View Details</Button>
+                                }
+                            ]}
+                            rowKey="_id"
+                        />
+                    </Card>
+                </TabPane>
+            </Tabs>
         </div>
     );
 };
