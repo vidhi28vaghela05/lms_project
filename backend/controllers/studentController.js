@@ -4,6 +4,8 @@ const Enrollment = require('../models/Enrollment');
 const Review = require('../models/Review');
 const Certificate = require('../models/Certificate');
 const crypto = require('crypto');
+const PDFDocument = require('pdfkit');
+const mongoose = require('mongoose');
 
 exports.getRecommendations = async (req, res) => {
   try {
@@ -89,6 +91,32 @@ exports.addReview = async (req, res) => {
   }
 };
 
+exports.editReview = async (req, res) => {
+  try {
+    const { rating, comment } = req.body;
+    const review = await Review.findById(req.params.id);
+    
+    if (!review) return res.status(404).json({ message: 'Review not found' });
+    if (review.userId.toString() !== req.user.id) return res.status(401).json({ message: 'Not authorized' });
+
+    review.rating = rating || review.rating;
+    review.comment = comment || review.comment;
+    await review.save();
+
+    // Re-calculate course average
+    const reviews = await Review.find({ courseId: review.courseId });
+    const avg = reviews.reduce((acc, curr) => acc + curr.rating, 0) / reviews.length;
+    await mongoose.model('Course').findByIdAndUpdate(review.courseId, { 
+      averageRating: avg,
+      reviewCount: reviews.length
+    });
+
+    res.json(review);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 exports.updateModuleProgress = async (req, res) => {
   try {
     const { courseId, lessonId, completed } = req.body;
@@ -120,23 +148,59 @@ exports.updateModuleProgress = async (req, res) => {
 exports.generateCertificate = async (req, res) => {
   try {
     const { courseId } = req.params;
-    const enrollment = await Enrollment.findOne({ studentId: req.user.id, courseId });
+    const enrollment = await Enrollment.findOne({ studentId: req.user.id, courseId })
+      .populate('studentId', 'name')
+      .populate('courseId', 'title');
 
     if (!enrollment || enrollment.progressPercentage < 100) {
       return res.status(400).json({ message: 'Course must be 100% completed' });
     }
 
-    const existingCert = await Certificate.findOne({ userId: req.user.id, courseId });
-    if (existingCert) return res.json(existingCert);
+    let certificate = await Certificate.findOne({ userId: req.user.id, courseId });
+    if (!certificate) {
+      const certificateHash = crypto.randomBytes(16).toString('hex');
+      certificate = await Certificate.create({
+        userId: req.user.id,
+        courseId,
+        certificateHash
+      });
+    }
 
-    const certificateHash = crypto.randomBytes(16).toString('hex');
-    const certificate = await Certificate.create({
-      userId: req.user.id,
-      courseId,
-      certificateHash
-    });
+    // Generate PDF
+    const doc = new PDFDocument({ layout: 'landscape', size: 'A4' });
+    
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=Certificate-${courseId}.pdf`);
+    
+    doc.pipe(res);
 
-    res.status(201).json(certificate);
+    // Design
+    doc.rect(0, 0, doc.page.width, doc.page.height).fill('#f8f9fa');
+    doc.rect(20, 20, doc.page.width - 40, doc.page.height - 40).stroke('#1d3557');
+
+    doc.fillColor('#1d3557').fontSize(40).text('CERTIFICATE OF COMPLETION', 0, 100, { align: 'center' });
+    
+    doc.moveDown();
+    doc.fontSize(20).text('This is to certify that', { align: 'center' });
+    
+    doc.moveDown();
+    doc.fillColor('#e63946').fontSize(30).text(enrollment.studentId.name.toUpperCase(), { align: 'center' });
+    
+    doc.moveDown();
+    doc.fillColor('#1d3557').fontSize(20).text('has successfully completed the course', { align: 'center' });
+    
+    doc.moveDown();
+    doc.fontSize(25).text(enrollment.courseId.title, { align: 'center' });
+    
+    doc.moveDown(2);
+    doc.fontSize(12).text(`Date: ${new Date().toLocaleDateString()}`, 100, 450);
+    doc.text(`Verify at: lms-verify.id/${certificate.certificateHash}`, 100, 470);
+    
+    doc.text('AUTHORIZED SIGNATURE', 550, 450);
+    doc.lineCap('butt').moveTo(550, 445).lineTo(750, 445).stroke();
+
+    doc.end();
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

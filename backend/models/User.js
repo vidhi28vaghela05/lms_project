@@ -29,6 +29,7 @@ const userSchema = new mongoose.Schema({
   registrationDescription: String,
   upiId: String,
   payableAmount: { type: Number, default: 0 },
+  isActive: { type: Boolean, default: true },
 
   // Student Specifics
   wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }]

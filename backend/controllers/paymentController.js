@@ -111,3 +111,14 @@ exports.submitUPIPayment = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.getMyPaymentHistory = async (req, res) => {
+  try {
+    const payments = await Payment.find({ userId: req.user.id })
+      .populate('courseId', 'title')
+      .sort({ createdAt: -1 });
+    res.json(payments);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

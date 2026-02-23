@@ -21,8 +21,16 @@ const StudentDashboard = () => {
         const fetchDashboardData = async () => {
             try {
                 const { data } = await api.get('/student/my-courses');
-                setCourses(data || []);
-                // For stats, we might need a separate call or calculate here
+                const enrollments = data || [];
+                setCourses(enrollments);
+
+                const completed = enrollments.filter(e => e.progressPercentage >= 100).length;
+                const inProgress = enrollments.length - completed;
+                const totalScore = enrollments.reduce((acc, curr) => acc + (curr.progressPercentage || 0), 0);
+                const avgScore = enrollments.length > 0 ? Math.round(totalScore / enrollments.length) : 0;
+
+                setStats({ completed, inProgress, avgScore });
+
                 const wishRes = await api.get('/student/wishlist');
                 setWishlist(wishRes.data);
             } catch (error) {
@@ -77,9 +85,21 @@ const StudentDashboard = () => {
                             type="primary"
                             size="small"
                             icon={<TrophyOutlined />}
-                            onClick={() => api.get(`/student/certificate/${record.courseId._id}`).then(res => {
-                                window.open(res.data.pdfUrl || '#', '_blank');
-                            })}
+                            onClick={async () => {
+                                try {
+                                    const response = await api.get(`/student/certificate/${record.courseId._id}`, {
+                                        responseType: 'blob'
+                                    });
+                                    const url = window.URL.createObjectURL(new Blob([response.data]));
+                                    const link = document.createElement('a');
+                                    link.href = url;
+                                    link.setAttribute('download', `Certificate-${record.courseId.title}.pdf`);
+                                    document.body.appendChild(link);
+                                    link.click();
+                                } catch (err) {
+                                    message.error('Certificate retrieval failed');
+                                }
+                            }}
                         >
                             Certificate
                         </Button>

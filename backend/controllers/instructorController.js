@@ -4,6 +4,8 @@ const Payout = require('../models/Payout');
 const User = require('../models/User');
 const Review = require('../models/Review');
 const Enrollment = require('../models/Enrollment');
+const Message = require('../models/Message');
+const bcrypt = require('bcryptjs');
 
 exports.getInstructorStats = async (req, res) => {
   try {
@@ -86,6 +88,75 @@ exports.getStudentPerformance = async (req, res) => {
       .populate('studentId', 'name email')
       .populate('courseId', 'title');
     res.json(performance);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.updateProfile = async (req, res) => {
+  try {
+    const { name, upiId, registrationDescription } = req.body;
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (name) user.name = name;
+    if (upiId) user.upiId = upiId;
+    if (registrationDescription) user.registrationDescription = registrationDescription;
+
+    await user.save();
+    res.json({ message: 'Profile updated successfully', user: { name: user.name, email: user.email, upiId: user.upiId } });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const user = await User.findById(req.user.id);
+    
+    const isMatch = await user.comparePassword(currentPassword);
+    if (!isMatch) return res.status(400).json({ message: 'Invalid current password' });
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    await user.save();
+
+    res.json({ message: 'Password changed successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getMessages = async (req, res) => {
+  try {
+    const messages = await Message.find({
+      $or: [
+        { sender: req.user.id },
+        { receiver: req.user.id }
+      ]
+    }).sort({ createdAt: 1 }).populate('sender receiver', 'name role');
+    res.json(messages);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.sendMessage = async (req, res) => {
+  try {
+    const { message } = req.body;
+    // For instructor panel, receiver is always the admin if not specified
+    // In a real app, you might find an admin user or use a flag
+    let admin = await User.findOne({ role: 'admin' });
+    if (!admin) return res.status(404).json({ message: 'Admin not found' });
+
+    const newMessage = await Message.create({
+      sender: req.user.id,
+      receiver: admin._id,
+      message
+    });
+
+    res.status(201).json(newMessage);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

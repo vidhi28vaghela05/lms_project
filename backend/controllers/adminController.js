@@ -3,6 +3,8 @@ const Course = require('../models/Course');
 const Payment = require('../models/Payment');
 const Payout = require('../models/Payout');
 const Review = require('../models/Review');
+const Category = require('../models/Category');
+const SystemSetting = require('../models/SystemSetting');
 
 exports.getAllUsers = async (req, res) => {
   try {
@@ -16,6 +18,7 @@ exports.getAllUsers = async (req, res) => {
 exports.getSystemAnalytics = async (req, res) => {
   try {
     const totalUsers = await User.countDocuments({});
+    const totalStudents = await User.countDocuments({ role: 'student' });
     const totalCourses = await Course.countDocuments({});
     const totalInstructors = await User.countDocuments({ role: 'instructor', status: 'approved' });
     
@@ -34,12 +37,25 @@ exports.getSystemAnalytics = async (req, res) => {
       { $group: { _id: null, total: { $sum: "$platformEarnings" } } }
     ]);
 
+    const totalRevenue = await Payment.aggregate([
+      { $match: { status: 'completed' } },
+      { $group: { _id: null, total: { $sum: "$amount" } } }
+    ]);
+
+    const totalPayable = await User.aggregate([
+      { $match: { role: 'instructor' } },
+      { $group: { _id: null, total: { $sum: "$payableAmount" } } }
+    ]);
+
     res.json({
       totalUsers,
+      totalStudents,
       totalCourses,
       totalInstructors,
       todayIncome: todayIncome[0]?.total || 0,
-      monthIncome: monthIncome[0]?.total || 0
+      monthIncome: monthIncome[0]?.total || 0,
+      totalRevenue: totalRevenue[0]?.total || 0,
+      totalPayable: totalPayable[0]?.total || 0
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -107,25 +123,174 @@ exports.confirmManualPayment = async (req, res) => {
     payment.isConfirmed = true;
     await payment.save();
 
-    // Find course to get instructor
     const course = await Course.findById(payment.courseId);
-    if (!course) return res.status(404).json({ message: 'Course associated with payment not found' });
-
-    // Update instructor payable balance
     const instructor = await User.findById(course.instructorId);
     if (instructor) {
       instructor.payableAmount += payment.instructorEarnings;
       await instructor.save();
     }
 
-    // Create Enrollment for the student
     const Enrollment = require('../models/Enrollment');
     await Enrollment.create({
       studentId: payment.userId,
       courseId: payment.courseId
     });
 
-    res.json({ message: 'Payment confirmed, enrollment created, and instructor balance updated' });
+    res.json({ message: 'Payment confirmed & Balance updated' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getPayoutRecords = async (req, res) => {
+  try {
+    const payouts = await Payout.find().populate('instructorId', 'name email upiId');
+    res.json(payouts);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.processPayout = async (req, res) => {
+  try {
+    const { instructorId, amount, transactionRef } = req.body;
+    const instructor = await User.findById(instructorId);
+    
+    if (!instructor || instructor.payableAmount < amount) {
+      return res.status(400).json({ message: 'Invalid payout amount or instructor' });
+    }
+
+    await Payout.create({
+      instructorId,
+      amount,
+      month: new Date().getMonth() + 1,
+      year: new Date().getFullYear(),
+      status: 'paid',
+      transactionRef,
+      payoutDate: new Date()
+    });
+
+    instructor.payableAmount -= amount;
+    await instructor.save();
+
+    res.json({ message: 'Payout processed successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.deleteReview = async (req, res) => {
+  try {
+    const review = await Review.findByIdAndDelete(req.params.id);
+    if (!review) return res.status(404).json({ message: 'Review not found' });
+    
+    // Recalculate average
+    const reviews = await Review.find({ courseId: review.courseId });
+    const avg = reviews.length > 0 ? reviews.reduce((acc, curr) => acc + curr.rating, 0) / reviews.length : 0;
+    
+    await Course.findByIdAndUpdate(review.courseId, {
+      averageRating: avg,
+      reviewCount: reviews.length
+    });
+
+    res.json({ message: 'Review moderated and removed' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getAllReviews = async (req, res) => {
+  try {
+    const reviews = await Review.find()
+      .populate('userId', 'name')
+      .populate('courseId', 'title')
+      .sort({ createdAt: -1 });
+    res.json(reviews);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getCategories = async (req, res) => {
+  try {
+    const categories = await Category.find();
+    res.json(categories);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.createCategory = async (req, res) => {
+  try {
+    const category = await Category.create(req.body);
+    res.json(category);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.deleteCategory = async (req, res) => {
+  try {
+    await Category.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Category removed' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getSettings = async (req, res) => {
+  try {
+    const settings = await SystemSetting.find();
+    res.json(settings);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.updateSetting = async (req, res) => {
+  try {
+    const { key, value } = req.body;
+    const setting = await SystemSetting.findOneAndUpdate(
+      { key },
+      { value },
+      { upsert: true, new: true }
+    );
+    res.json(setting);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.deleteUser = async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ message: 'User deleted' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.updateUser = async (req, res) => {
+  try {
+    const { name, email, role } = req.body;
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { name, email, role },
+      { new: true }
+    ).select('-password');
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.toggleUserStatus = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    user.isActive = !user.isActive;
+    await user.save();
+    res.json({ message: `User ${user.isActive ? 'activated' : 'deactivated'}`, isActive: user.isActive });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

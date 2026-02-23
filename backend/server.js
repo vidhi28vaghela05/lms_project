@@ -70,7 +70,14 @@ app.use(express.static(frontendBuildPath));
 // Handle React Routing
 app.use((req, res) => {
   if (!req.url.startsWith('/api')) {
-    res.sendFile(path.join(frontendBuildPath, 'index.html'));
+    const indexPath = path.join(frontendBuildPath, 'index.html');
+    console.log('Serving index.html from:', indexPath);
+    res.sendFile(indexPath, (err) => {
+      if (err) {
+        console.error('Error sending index.html:', err);
+        res.status(500).send(err.message);
+      }
+    });
   }
 });
 

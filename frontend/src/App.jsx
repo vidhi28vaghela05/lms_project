@@ -16,6 +16,8 @@ import InstructorDashboard from './pages/InstructorDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import LessonViewer from './pages/LessonViewer';
 import QuizPage from './pages/QuizPage';
+import ProfilePage from './pages/ProfilePage';
+import PaymentHistory from './pages/PaymentHistory';
 import SkillGraphView from './pages/SkillGraphView';
 import MyCourses from './pages/MyCourses';
 import CheckoutPage from './pages/CheckoutPage';
@@ -41,10 +43,42 @@ function AppRoutes() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password/:token" element={<ResetPassword />} />
 
+      <Route path="/profile" element={
+        <ProtectedRoute>
+          <MainLayout onLogout={logout}>
+            <ProfilePage />
+          </MainLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/billing" element={
+        <ProtectedRoute role="student">
+          <MainLayout onLogout={logout}>
+            <PaymentHistory />
+          </MainLayout>
+        </ProtectedRoute>
+      } />
+
       <Route path="/dashboard" element={
         <ProtectedRoute>
           <MainLayout onLogout={logout}>
             {getDashboard()}
+          </MainLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/manage-users" element={
+        <ProtectedRoute role="admin">
+          <MainLayout onLogout={logout}>
+            <AdminDashboard />
+          </MainLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/system-stats" element={
+        <ProtectedRoute role="admin">
+          <MainLayout onLogout={logout}>
+            <AdminDashboard />
           </MainLayout>
         </ProtectedRoute>
       } />

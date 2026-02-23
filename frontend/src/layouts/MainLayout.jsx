@@ -8,6 +8,8 @@ import {
     LineChartOutlined,
     LogoutOutlined,
     DashboardOutlined,
+    WalletOutlined,
+    IdcardOutlined
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import LiveSupport from '../components/LiveSupport';
@@ -40,6 +42,8 @@ const MainLayout = ({ children, onLogout }) => {
                 ...common,
                 { key: '/my-courses', icon: <BookOutlined />, label: 'My Courses' },
                 { key: '/skill-graph', icon: <LineChartOutlined />, label: 'Skill Graph' },
+                { key: '/billing', icon: <WalletOutlined />, label: 'Billing & History' },
+                { key: '/profile', icon: <IdcardOutlined />, label: 'My Profile' },
             ];
         } else if (role === 'instructor') {
             return [
@@ -129,6 +133,7 @@ const MainLayout = ({ children, onLogout }) => {
                         boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
                     }}
                 >
+                    {children}
                 </Content>
             </Layout>
             <LiveSupport />

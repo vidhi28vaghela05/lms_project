@@ -5,6 +5,7 @@ const {
   toggleWishlist,
   getWishlist,
   addReview,
+  editReview,
   updateModuleProgress,
   generateCertificate
 } = require('../controllers/studentController');
@@ -17,6 +18,7 @@ router.get('/my-courses', protect, authorize('student'), getMyCourses);
 router.get('/wishlist', protect, authorize('student'), getWishlist);
 router.post('/wishlist/toggle', protect, authorize('student'), toggleWishlist);
 router.post('/review', protect, authorize('student'), addReview);
+router.put('/review/:id', protect, authorize('student'), editReview);
 router.post('/progress', protect, authorize('student'), updateModuleProgress);
 router.get('/certificate/:courseId', protect, authorize('student'), generateCertificate);
 

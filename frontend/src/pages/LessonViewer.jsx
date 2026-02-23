@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Layout, List, Typography, Card, Space, Spin, Button, message } from 'antd';
-import { PlayCircleOutlined, CheckCircleOutlined, ArrowRightOutlined } from '@ant-design/icons';
+import { PlayCircleOutlined, CheckCircleOutlined, ArrowRightOutlined, StarOutlined } from '@ant-design/icons';
+import { Layout, List, Typography, Card, Space, Spin, Button, message, Rate, Input, Divider } from 'antd';
 import api from '../services/api';
 
 const { Content, Sider } = Layout;
@@ -13,6 +13,8 @@ const LessonViewer = () => {
     const [currentLesson, setCurrentLesson] = useState(null);
     const [loading, setLoading] = useState(true);
     const [completedLessons, setCompletedLessons] = useState([]);
+    const [review, setReview] = useState({ rating: 0, comment: '' });
+    const [submittingReview, setSubmittingReview] = useState(false);
 
     useEffect(() => {
         const fetchLessons = async () => {
@@ -115,6 +117,47 @@ const LessonViewer = () => {
                                 </Button>
                             </Space>
                         </div>
+
+                        <Divider style={{ marginTop: 48 }} />
+
+                        <Card style={{ borderRadius: 12, background: '#f8f9fa' }}>
+                            <Title level={4}><StarOutlined /> Rate this Course</Title>
+                            <Text type="secondary">Share your cognitive feedback with the collective.</Text>
+                            <div style={{ marginTop: 16 }}>
+                                <Rate value={review.rating} onChange={(val) => setReview({ ...review, rating: val })} />
+                                <Input.TextArea
+                                    placeholder="Write your review..."
+                                    value={review.comment}
+                                    onChange={(e) => setReview({ ...review, comment: e.target.value })}
+                                    style={{ marginTop: 12, borderRadius: 8 }}
+                                    rows={3}
+                                />
+                                <Button
+                                    type="primary"
+                                    style={{ marginTop: 16 }}
+                                    loading={submittingReview}
+                                    onClick={async () => {
+                                        if (review.rating === 0) return message.warning('Indicate precision level (rating)');
+                                        setSubmittingReview(true);
+                                        try {
+                                            await api.post('/student/review', {
+                                                courseId,
+                                                rating: review.rating,
+                                                comment: review.comment
+                                            });
+                                            message.success('Neural feedback transmitted');
+                                            setReview({ rating: 0, comment: '' });
+                                        } catch (err) {
+                                            message.error(err.response?.data?.message || 'Feedback sync failed');
+                                        } finally {
+                                            setSubmittingReview(false);
+                                        }
+                                    }}
+                                >
+                                    Transmit Review
+                                </Button>
+                            </div>
+                        </Card>
                     </div>
                 ) : (
                     <Title level={4}>Select a lesson to start learning.</Title>
