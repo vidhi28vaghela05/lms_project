@@ -124,15 +124,6 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 3000;
 
-server.on('error', (e) => {
-  if (e.code === 'EADDRINUSE') {
-    console.warn(`\n⚠️  Port ${PORT} is already in use.`);
-    console.warn(`Please close the application running on this port or use a different PORT.\n`);
-    process.exit(1);
-  }
-});
-
 server.listen(PORT, () => {
-  console.log(`\n🚀 LMS Ecosystem is Live!`);
-  console.log(`🔗 Access it at: http://localhost:${PORT}/\n`);
+    console.log(`Server running on port ${PORT}`);
 });
