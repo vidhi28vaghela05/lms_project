@@ -24,7 +24,7 @@ const OTPVerification = () => {
             setLoading(true);
             const response = await api.post('/auth/verify-otp', { email, code: values.code });
             message.success('Account Verified Successfully');
-            localStorage.setItem('token', response.data.token);
+            sessionStorage.setItem('token', response.data.token);
             navigate('/dashboard');
         } catch (error) {
             setLoading(false);

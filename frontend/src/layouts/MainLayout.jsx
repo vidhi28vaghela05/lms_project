@@ -21,7 +21,7 @@ const MainLayout = ({ children, onLogout }) => {
     const [collapsed, setCollapsed] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
-    const role = localStorage.getItem('role');
+    const role = sessionStorage.getItem('role');
 
     const {
         token: { colorBgContainer, borderRadiusLG },

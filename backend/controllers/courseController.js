@@ -45,9 +45,21 @@ exports.getCourses = async (req, res) => {
       query.skillsCovered = { $in: skillsArray };
     }
 
-    // Admins can see non-approved courses
-    if (req.user && req.user.role === 'admin') {
-      delete query.isApproved;
+    // Unified Authorization-based filtering
+    if (req.user) {
+      if (req.user.role === 'admin') {
+        delete query.isApproved;
+      } else if (req.user.role === 'instructor') {
+        query = {
+          ...query,
+          $or: [
+            { isApproved: true },
+            { instructorId: req.user.id }
+          ]
+        };
+        // Remove the default filter to allow the $or to work
+        delete query.isApproved;
+      }
     }
 
     const courses = await Course.find(query).populate('instructorId', 'name email');

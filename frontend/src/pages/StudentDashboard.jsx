@@ -16,10 +16,13 @@ const StudentDashboard = () => {
         avgScore: 0
     });
     const [wishlist, setWishlist] = useState([]);
+    const [recommendations, setRecommendations] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
+                setLoading(true);
                 const { data } = await api.get('/student/my-courses');
                 const enrollments = data || [];
                 setCourses(enrollments);
@@ -33,8 +36,13 @@ const StudentDashboard = () => {
 
                 const wishRes = await api.get('/student/wishlist');
                 setWishlist(wishRes.data);
+
+                const recRes = await api.get('/student/recommendations');
+                setRecommendations(recRes.data);
             } catch (error) {
                 console.error('Failed to fetch student dashboard data', error);
+            } finally {
+                setLoading(false);
             }
         };
         fetchDashboardData();
@@ -148,14 +156,84 @@ const StudentDashboard = () => {
 
             <Tabs defaultActiveKey="1" style={{ marginTop: 24 }}>
                 <TabPane tab="My Enlistments" key="1">
-                    <Card className="glass-card">
-                        <Table
-                            columns={columns}
-                            dataSource={courses}
-                            rowKey="_id"
-                            pagination={false}
-                        />
-                    </Card>
+                    <Row gutter={[24, 24]}>
+                        {courses.length > 0 ? (
+                            courses.map((enrollment) => (
+                                <Col xs={24} md={8} key={enrollment._id}>
+                                    <Card
+                                        hoverable
+                                        className="glass-card"
+                                        cover={
+                                            <div style={{ height: 140, background: 'linear-gradient(135deg, #1d3557, #457b9d)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                {enrollment.courseId?.thumbnail ? (
+                                                    <img src={enrollment.courseId.thumbnail} alt={enrollment.courseId.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                ) : (
+                                                    <BookOutlined style={{ fontSize: 40, color: '#fff' }} />
+                                                )}
+                                            </div>
+                                        }
+                                        actions={[
+                                            <Button type="link" onClick={() => navigate(`/lessons/${enrollment.courseId?._id}`)}>Resume</Button>,
+                                            enrollment.progressPercentage >= 100 && (
+                                                <Button type="link" onClick={() => navigate(`/certificate/${enrollment.courseId?._id}`)}>Certificate</Button>
+                                            )
+                                        ]}
+                                    >
+                                        <Card.Meta
+                                            title={enrollment.courseId?.title}
+                                            description={
+                                                <div>
+                                                    <Progress percent={enrollment.progressPercentage || 0} size="small" />
+                                                    <Tag color={enrollment.progressPercentage >= 100 ? 'green' : 'blue'} style={{ marginTop: 8 }}>
+                                                        {enrollment.progressPercentage >= 100 ? 'COMPLETED' : 'IN PROGRESS'}
+                                                    </Tag>
+                                                </div>
+                                            }
+                                        />
+                                    </Card>
+                                </Col>
+                            ))
+                        ) : (
+                            <Col span={24}>
+                                <Card style={{ textAlign: 'center', padding: '40px 0' }}>
+                                    <Text type="secondary">No active missions found. Teleport to the repository to begin.</Text><br />
+                                    <Button type="primary" style={{ marginTop: 16 }} onClick={() => navigate('/courses')}>Browse Repository</Button>
+                                </Card>
+                            </Col>
+                        )}
+                    </Row>
+                </TabPane>
+                <TabPane tab="Recommended for You" key="3">
+                    <Row gutter={[24, 24]}>
+                        {recommendations.map((course) => (
+                            <Col xs={24} md={8} key={course._id}>
+                                <Card
+                                    hoverable
+                                    className="glass-card"
+                                    cover={
+                                        <div style={{ height: 140, background: 'linear-gradient(135deg, #e63946, #1d3557)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            {course.thumbnail ? (
+                                                <img src={course.thumbnail} alt={course.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            ) : (
+                                                <BookOutlined style={{ fontSize: 40, color: '#fff' }} />
+                                            )}
+                                        </div>
+                                    }
+                                    onClick={() => navigate(`/courses`)}
+                                >
+                                    <Card.Meta
+                                        title={course.title}
+                                        description={
+                                            <div>
+                                                <Text type="secondary">{course.level.toUpperCase()}</Text><br />
+                                                <Text strong color="#e63946">${course.price || 0}</Text>
+                                            </div>
+                                        }
+                                    />
+                                </Card>
+                            </Col>
+                        ))}
+                    </Row>
                 </TabPane>
                 <TabPane tab="Vanguard Wishlist" key="2">
                     <Card className="glass-card">
