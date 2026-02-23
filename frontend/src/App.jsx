@@ -83,6 +83,54 @@ function AppRoutes() {
         </ProtectedRoute>
       } />
 
+      <Route path="/manage-courses" element={
+        <ProtectedRoute role="instructor">
+          <MainLayout onLogout={logout}>
+            <InstructorDashboard />
+          </MainLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/analytics" element={
+        <ProtectedRoute role="instructor">
+          <MainLayout onLogout={logout}>
+            <InstructorDashboard />
+          </MainLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/student-progress" element={
+        <ProtectedRoute role="instructor">
+          <MainLayout onLogout={logout}>
+            <InstructorDashboard />
+          </MainLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/instructor-earnings" element={
+        <ProtectedRoute role="instructor">
+          <MainLayout onLogout={logout}>
+            <InstructorDashboard />
+          </MainLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/instructor-support" element={
+        <ProtectedRoute role="instructor">
+          <MainLayout onLogout={logout}>
+            <InstructorDashboard />
+          </MainLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/instructor-profile" element={
+        <ProtectedRoute role="instructor">
+          <MainLayout onLogout={logout}>
+            <InstructorDashboard />
+          </MainLayout>
+        </ProtectedRoute>
+      } />
+
       <Route path="/my-courses" element={
         <ProtectedRoute role="student">
           <MainLayout onLogout={logout}>

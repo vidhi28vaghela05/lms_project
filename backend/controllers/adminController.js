@@ -5,6 +5,7 @@ const Payout = require('../models/Payout');
 const Review = require('../models/Review');
 const Category = require('../models/Category');
 const SystemSetting = require('../models/SystemSetting');
+const { sendPayoutConfirmation } = require('../utils/emailService');
 
 exports.getAllUsers = async (req, res) => {
   try {
@@ -172,6 +173,9 @@ exports.processPayout = async (req, res) => {
 
     instructor.payableAmount -= amount;
     await instructor.save();
+
+    // Send email notification
+    await sendPayoutConfirmation(instructor.email, amount, transactionRef);
 
     res.json({ message: 'Payout processed successfully' });
   } catch (error) {

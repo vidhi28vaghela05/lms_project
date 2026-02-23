@@ -68,4 +68,19 @@ const sendResetPasswordLink = async (email, link) => {
   return await sendEmail(email, subject, html);
 };
 
-module.exports = { sendOTP, sendResetPasswordLink };
+const sendPayoutConfirmation = async (email, amount, ref) => {
+  const subject = 'Payment Confirmed - LMS 3.0';
+  const html = `
+    <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 5px;">
+      <h2 style="color: #3f8600;">Payment Successful</h2>
+      <p>Your payout of <strong>$${amount}</strong> has been confirmed by the administrator.</p>
+      <p><strong>Transaction Reference:</strong> ${ref}</p>
+      <p>The amount should be reflected in your account shortly.</p>
+      <br/>
+      <p>Thank you for teaching with LMS 3.0!</p>
+    </div>
+  `;
+  return await sendEmail(email, subject, html);
+};
+
+module.exports = { sendOTP, sendResetPasswordLink, sendPayoutConfirmation };
