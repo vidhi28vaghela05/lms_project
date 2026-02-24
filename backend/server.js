@@ -103,18 +103,29 @@ io.on('connection', (socket) => {
   });
 
   socket.on('sendMessage', async (data) => {
-    const { senderId, receiverId, text } = data;
-    const newMessage = await Message.create({ 
-      sender: senderId, 
-      receiver: receiverId, 
-      message: text 
-    });
-    io.to(receiverId).emit('receiveMessage', {
-      senderId,
-      receiverId,
-      text,
-      createdAt: newMessage.createdAt
-    });
+    try {
+      const { senderId, receiverId, text } = data;
+      
+      // Basic validation to prevent crashes on placeholder IDs or missing data
+      if (!text || !senderId || !receiverId || receiverId === 'admin_id_placeholder') {
+        return;
+      }
+
+      const newMessage = await Message.create({ 
+        sender: senderId, 
+        receiver: receiverId, 
+        message: text 
+      });
+
+      io.to(receiverId).emit('receiveMessage', {
+        senderId,
+        receiverId,
+        text,
+        createdAt: newMessage.createdAt
+      });
+    } catch (error) {
+      console.error('Socket sendMessage error:', error.message);
+    }
   });
 
   socket.on('disconnect', () => {

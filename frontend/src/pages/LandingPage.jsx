@@ -8,7 +8,7 @@ import {
     Space,
     Layout,
     Tag,
-    ConfigProvider,
+    theme as antdTheme,
     Collapse,
     Rate,
     Avatar,
@@ -38,7 +38,7 @@ const { Title, Text, Paragraph } = Typography;
 
 const LandingPage = () => {
     const navigate = useNavigate();
-    console.log('LandingPage rendering...');
+    const { token } = antdTheme.useToken();
 
     const stats = [
         { label: '10K+', desc: 'Active Learners' },
@@ -49,662 +49,524 @@ const LandingPage = () => {
 
     const features = [
         {
-            icon: <ThunderboltOutlined />,
-            title: 'Intelligent Learning Paths',
-            desc: 'AI-powered recommendations tailored to your learning style and pace.'
+            icon: <RocketOutlined />,
+            title: 'Neural Acceleration',
+            desc: 'High-speed cognitive modules designed for rapid skill acquisition and professional evolution.'
         },
         {
-            icon: <BarChartOutlined />,
-            title: 'Real-time Analytics',
-            desc: 'Track your progress with detailed insights and performance metrics.'
+            icon: <BookOutlined />,
+            title: 'Elite Repository',
+            desc: 'Access a curated collection of advanced learning protocols verified by industry leaders.'
         },
         {
             icon: <TeamOutlined />,
-            title: 'Expert Instructors',
-            desc: 'Learn from industry veterans with decades of experience.'
-        },
-        {
-            icon: <GlobalOutlined />,
-            title: 'Global Community',
-            desc: 'Connect with learners and professionals worldwide.'
-        },
-        {
-            icon: <SecurityScanOutlined />,
-            title: 'Secure & Reliable',
-            desc: 'Enterprise-grade security and 99.9% uptime guarantee.'
-        },
-        {
-            icon: <RocketOutlined />,
-            title: 'Interactive Content',
-            desc: 'Quizzes, projects, and hands-on exercises for better retention.'
-        }
-    ];
-
-    const courses = [
-        {
-            title: 'Advanced Web Development',
-            instructor: 'Sarah Chen',
-            students: '2.5K',
-            rating: 4.9,
-            price: 'Free',
-            badge: 'Most Popular'
-        },
-        {
-            title: 'Cloud Infrastructure Mastery',
-            instructor: 'Alex Kumar',
-            students: '1.8K',
-            rating: 4.8,
-            price: 'Free',
-            badge: 'Trending'
-        },
-        {
-            title: 'Full-Stack Development',
-            instructor: 'Marcus Johnson',
-            students: '3.2K',
-            rating: 4.9,
-            price: 'Free',
-            badge: 'Bestseller'
+            title: 'Collective Intelligence',
+            desc: 'Connect with a global network of elite learners and synchronize your progress.'
         }
     ];
 
     const testimonials = [
         {
-            name: 'Emily Rodriguez',
-            role: 'Software Engineer @ Tech Corp',
-            emoji: '🎓',
-            text: 'LMS 3.0 transformed my career. The structured learning paths helped me master cloud technologies in just 3 months!',
-            rating: 5
+            rating: 5,
+            text: "The transition to LMS 3.0 has completely synchronized my career path. The neural interface is seamless.",
+            emoji: "👤",
+            name: "Alex Rivera",
+            role: "Senior Protocol Engineer"
         },
         {
-            name: 'David Park',
-            role: 'Full-Stack Developer',
-            emoji: '💻',
-            text: 'The real-time analytics feature gives me instant feedback on my progress. Absolutely game-changing!',
-            rating: 5
+            rating: 5,
+            text: "Highly optimized learning modules. I synchronized my React skills in record time.",
+            emoji: "👤",
+            name: "Sarah Chen",
+            role: "Frontend Architect"
         },
         {
-            name: 'Lisa Thompson',
-            role: 'Instructor @ University',
-            emoji: '👨‍🏫',
-            text: 'As an instructor, I love how easy it is to manage courses and track student progress. Highly recommended!',
-            rating: 5
+            rating: 5,
+            text: "The best ROI for time spent. Every module is a high-frequency transmission of pure knowledge.",
+            emoji: "👤",
+            name: "Marcus Thorne",
+            role: "Security Analyst"
         }
     ];
 
     const pricingPlans = [
         {
-            name: 'Starter',
+            name: 'Initiate',
+            desc: 'Basic access to the collective repository.',
             price: 'Free',
-            desc: 'Perfect for beginners',
-            features: ['Access to 50+ free courses', 'Community support', 'Progress tracking', 'Basic analytics'],
+            features: [
+                'Access to Free Modules',
+                'Standard Sync Speed',
+                'Community Support'
+            ],
             btnType: 'default'
         },
         {
-            name: 'Professional',
-            price: '$19/month',
-            desc: 'For serious learners',
-            features: ['All Starter features', 'Access to all courses', 'Priority support', 'Advanced analytics', 'Certificates', 'Lifetime access'],
+            name: 'Elite',
+            desc: 'Optimized for career transformation.',
+            price: '$49/mo',
+            features: [
+                'Unlimited Repository Access',
+                'Neural Analytics',
+                'Priority Support Link',
+                'Certificates of Evolution'
+            ],
             btnType: 'primary',
-            badge: 'POPULAR'
+            badge: 'MOST POPULAR'
         },
         {
-            name: 'Enterprise',
-            price: 'Custom',
-            desc: 'For organizations',
-            features: ['All Professional features', 'Team management', 'Custom branding', 'Dedicated support', 'API access', 'SSO integration'],
-            btnType: 'primary'
+            name: 'Nexus',
+            desc: 'Full synchronization for teams.',
+            price: '$199/mo',
+            features: [
+                'Team Management Console',
+                'Dedicated Support Channel',
+                'Custom Protocol Integration',
+                'White-label Transmission'
+            ],
+            btnType: 'default'
         }
     ];
 
     const faqs = [
         {
             key: '1',
-            label: 'How do I get started?',
-            children: (
-                <Paragraph>
-                    Simply click the "Sign Up" button, create an account, and browse our course catalog. You can start learning immediately with free courses or upgrade to access premium content.
-                </Paragraph>
-            )
+            label: <Text style={{ color: '#ccd6f6', fontWeight: 600 }}>What is Neural Learning?</Text>,
+            children: <Paragraph style={{ color: '#8892b0' }}>Neural learning is our optimized protocol for translating information into long-term professional skills using high-frequency modules.</Paragraph>
         },
         {
             key: '2',
-            label: 'Are certificates provided?',
-            children: (
-                <Paragraph>
-                    Yes! Upon completing any course, you'll receive a verified certificate that you can share on your professional profiles like LinkedIn and GitHub.
-                </Paragraph>
-            )
-        },
-        {
-            key: '3',
-            label: 'Can I learn at my own pace?',
-            children: (
-                <Paragraph>
-                    Absolutely! Our platform is designed for self-paced learning. Access courses anytime, anywhere, and progress at your own speed. There are no fixed schedules.
-                </Paragraph>
-            )
-        },
-        {
-            key: '4',
-            label: 'What if I need help?',
-            children: (
-                <Paragraph>
-                    We offer 24/7 community support, mentor access, and detailed documentation. Premium members get priority support from our expert team.
-                </Paragraph>
-            )
-        },
-        {
-            key: '5',
-            label: 'Is there a refund policy?',
-            children: (
-                <Paragraph>
-                    Yes, we offer a 30-day money-back guarantee on all premium plans. If you're not satisfied, we'll refund your subscription in full.
-                </Paragraph>
-            )
-        },
-        {
-            key: '6',
-            label: 'Can I cancel anytime?',
-            children: (
-                <Paragraph>
-                    Yes, you can cancel your subscription anytime with no questions asked. Your access will continue until the end of your billing period.
-                </Paragraph>
-            )
+            label: <Text style={{ color: '#ccd6f6', fontWeight: 600 }}>How do I synchronize my certificates?</Text>,
+            children: <Paragraph style={{ color: '#8892b0' }}>Certificates are automatically synchronized to your profile once a module reached 100% completion in your repository.</Paragraph>
         }
     ];
 
     return (
-        <ConfigProvider
-            theme={{
-                token: {
-                    colorPrimary: '#e63946',
-                    borderRadius: 12,
-                },
-            }}
-        >
-            <Layout style={{ background: '#fff' }}>
-                <Navbar />
+        <Layout style={{ background: '#0a192f', overflow: 'hidden' }}>
+            <Navbar />
 
-                <Content>
-                    {/* ============ HERO SECTION ============ */}
-                    <section
-                        id="home"
+            <Content>
+                {/* ============ HERO SECTION ============ */}
+                <section
+                    id="home"
+                    style={{
+                        background: 'linear-gradient(135deg, #0a192f 0%, #112240 100%)',
+                        padding: '160px 24px 100px',
+                        textAlign: 'center',
+                        color: 'white',
+                        position: 'relative',
+                        overflow: 'hidden',
+                        borderBottom: '1px solid rgba(0, 209, 178, 0.1)'
+                    }}
+                >
+                    {/* Abstract Soft Glows */}
+                    <div
                         style={{
-                            background: 'linear-gradient(135deg, #1d3557 0%, #457b9d 100%)',
-                            padding: '160px 50px 100px',
-                            textAlign: 'center',
-                            color: 'white',
-                            position: 'relative',
-                            overflow: 'hidden'
+                            position: 'absolute',
+                            top: '-10%',
+                            right: '-10%',
+                            width: '500px',
+                            height: '500px',
+                            background: 'rgba(0, 209, 178, 0.05)',
+                            borderRadius: '50%',
+                            filter: 'blur(80px)',
+                            animation: 'float 6s infinite ease-in-out'
                         }}
-                    >
-                        <div
-                            style={{
-                                position: 'absolute',
-                                top: '-10%',
-                                right: '-10%',
-                                width: '500px',
-                                height: '500px',
-                                background: 'rgba(230, 57, 70, 0.1)',
-                                borderRadius: '50%',
-                                filter: 'blur(100px)',
-                                animation: 'float 6s infinite ease-in-out'
-                            }}
-                        />
-                        <div
-                            style={{
-                                position: 'absolute',
-                                bottom: '-20%',
-                                left: '10%',
-                                width: '400px',
-                                height: '400px',
-                                background: 'rgba(69, 123, 157, 0.2)',
-                                borderRadius: '50%',
-                                filter: 'blur(80px)',
-                                animation: 'float 8s infinite ease-in-out'
-                            }}
-                        />
+                    />
 
-                        <div style={{ maxWidth: 900, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-                            <Tag color="red" style={{ padding: '8px 16px', fontSize: '14px', marginBottom: 24 }}>
-                                ✨ Welcome to LMS 3.0
-                            </Tag>
+                    <div style={{ maxWidth: 900, margin: '0 auto', position: 'relative', zIndex: 1 }} className="fade-in">
+                        <Tag color="cyan" style={{ padding: '8px 16px', fontSize: '14px', marginBottom: 24, borderRadius: '20px', fontWeight: 600, background: 'rgba(0, 209, 178, 0.1)', border: '1px solid rgba(0, 209, 178, 0.2)' }}>
+                            ✨ TRANSMISSION RECEIVED: LMS 3.0
+                        </Tag>
 
-                            <Title
-                                level={1}
+                        <Title
+                            level={1}
+                            style={{
+                                color: '#fff',
+                                fontSize: 'clamp(40px, 8vw, 72px)',
+                                marginBottom: 24,
+                                lineHeight: 1.2,
+                                fontWeight: 800
+                            }}
+                        >
+                            Sync Your <span className="glow-text">Mind</span> with{' '}
+                            <span className="glow-text">Elite Intelligence</span>
+                        </Title>
+
+                        <Paragraph
+                            style={{
+                                color: '#8892b0',
+                                fontSize: '20px',
+                                marginBottom: 48,
+                                maxWidth: '700px',
+                                margin: '0 auto 48px',
+                                lineHeight: 1.6
+                            }}
+                        >
+                            Access the neural frequency for high-performance learning. Expert-led modules synchronized directly to your dashboard. Join the collective evolution.
+                        </Paragraph>
+
+                        <Space size="large" wrap justify="center">
+                            <Button
+                                type="primary"
+                                size="large"
+                                onClick={() => navigate('/register')}
+                                className="pulse-glow"
                                 style={{
-                                    color: 'white',
-                                    fontSize: 'clamp(40px, 8vw, 72px)',
-                                    marginBottom: 24,
-                                    lineHeight: 1.2,
-                                    fontWeight: 800
+                                    height: 55,
+                                    padding: '0 40px',
+                                    fontSize: 16,
+                                    borderRadius: '12px',
+                                    fontWeight: 700,
+                                    background: '#00d1b2',
+                                    border: 'none',
+                                    color: '#0a192f',
+                                    boxShadow: '0 8px 20px rgba(0, 209, 178, 0.3)'
                                 }}
                             >
-                                Transform Your <span style={{ color: '#e63946' }}>Career</span> with{' '}
-                                <span style={{ color: '#e63946' }}>Elite Learning</span>
-                            </Title>
-
-                            <Paragraph
+                                Initalize Learning <ArrowRightOutlined />
+                            </Button>
+                            <Button
+                                type="default"
+                                size="large"
+                                onClick={() => navigate('/courses')}
                                 style={{
-                                    color: 'rgba(255,255,255,0.85)',
-                                    fontSize: '20px',
-                                    marginBottom: 48,
-                                    maxWidth: '700px',
-                                    margin: '0 auto 48px'
+                                    height: 55,
+                                    padding: '0 40px',
+                                    fontSize: 16,
+                                    borderRadius: '12px',
+                                    fontWeight: 700,
+                                    background: 'rgba(255,255,255,0.05)',
+                                    border: '1px solid rgba(0, 209, 178, 0.3)',
+                                    color: '#00d1b2'
                                 }}
                             >
-                                Unlock your potential with AI-powered learning, expert instructors, and a global community. Start your journey today.
-                            </Paragraph>
-
-                            <Space size="large">
-                                <Button
-                                    type="primary"
-                                    size="large"
-                                    onClick={() => navigate('/register')}
-                                    style={{
-                                        height: 55,
-                                        padding: '0 40px',
-                                        fontSize: 16,
-                                        background: '#e63946',
-                                        borderColor: '#e63946',
-                                        borderRadius: '30px',
-                                        fontWeight: 700,
-                                        boxShadow: '0 8px 24px rgba(230, 57, 70, 0.3)'
-                                    }}
-                                >
-                                    Start Learning Today <ArrowRightOutlined />
-                                </Button>
-                                <Button
-                                    type="default"
-                                    size="large"
-                                    onClick={() => navigate('/courses')}
-                                    style={{
-                                        height: 55,
-                                        padding: '0 40px',
-                                        fontSize: 16,
-                                        borderRadius: '30px',
-                                        fontWeight: 700,
-                                        background: 'rgba(255,255,255,0.1)',
-                                        border: '2px solid rgba(255,255,255,0.3)',
-                                        color: '#fff'
-                                    }}
-                                >
-                                    Explore Courses
-                                </Button>
-                            </Space>
-                        </div>
-                    </section>
-
-                    {/* ============ STATS SECTION ============ */}
-                    <section style={{ padding: '80px 50px', background: '#f8f9fa' }}>
-                        <Row gutter={[40, 40]} style={{ maxWidth: 1200, margin: '0 auto' }}>
-                            {stats.map((stat, idx) => (
-                                <Col xs={24} sm={12} md={6} key={idx}>
-                                    <div style={{ textAlign: 'center' }}>
-                                        <div style={{ fontSize: '48px', fontWeight: 800, color: '#e63946', marginBottom: 8 }}>
-                                            {stat.label}
-                                        </div>
-                                        <Text type="secondary" style={{ fontSize: '16px' }}>
-                                            {stat.desc}
-                                        </Text>
-                                    </div>
-                                </Col>
-                            ))}
-                        </Row>
-                    </section>
-
-                    {/* ============ FEATURES SECTION ============ */}
-                    <section id="features" style={{ padding: '100px 50px', background: '#fff' }}>
-                        <div style={{ textAlign: 'center', marginBottom: 60, maxWidth: 1200, margin: '0 auto' }}>
-                            <Tag color="blue">POWERFUL FEATURES</Tag>
-                            <Title level={2} style={{ marginTop: 16, marginBottom: 24 }}>
-                                Everything You Need to Succeed
-                            </Title>
-                            <Paragraph style={{ fontSize: '18px', color: '#666', maxWidth: 600, margin: '0 auto' }}>
-                                Our platform combines cutting-edge technology with proven learning methodologies to create the perfect learning experience.
-                            </Paragraph>
-                        </div>
-
-                        <Row gutter={[32, 32]} style={{ maxWidth: 1200, margin: '0 auto' }}>
-                            {features.map((feature, idx) => (
-                                <Col xs={24} md={8} key={idx}>
-                                    <Card
-                                        bordered={false}
-                                        style={{
-                                            height: '100%',
-                                            borderRadius: '20px',
-                                            padding: '40px',
-                                            background: '#fff',
-                                            boxShadow: '0 4px 16px rgba(0,0,0,0.05)',
-                                            transition: 'all 0.3s ease',
-                                            cursor: 'pointer'
-                                        }}
-                                        onMouseEnter={(e) => {
-                                            e.currentTarget.style.transform = 'translateY(-12px)';
-                                            e.currentTarget.style.boxShadow = '0 16px 40px rgba(0,0,0,0.1)';
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.currentTarget.style.transform = 'translateY(0)';
-                                            e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.05)';
-                                        }}
-                                    >
-                                        <div
-                                            style={{
-                                                fontSize: 48,
-                                                color: '#e63946',
-                                                marginBottom: 24,
-                                                background: '#f5f5f5',
-                                                width: '80px',
-                                                height: '80px',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                borderRadius: '16px'
-                                            }}
-                                        >
-                                            {feature.icon}
-                                        </div>
-                                        <Title level={4}>{feature.title}</Title>
-                                        <Text type="secondary">{feature.desc}</Text>
-                                    </Card>
-                                </Col>
-                            ))}
-                        </Row>
-                    </section>
-
-
-                    {/* ============ TESTIMONIALS SECTION ============ */}
-                    <section style={{ padding: '100px 50px', background: '#fff' }}>
-                        <div style={{ textAlign: 'center', marginBottom: 60 }}>
-                            <Tag color="cyan">SUCCESS STORIES</Tag>
-                            <Title level={2} style={{ marginTop: 16 }}>
-                                What Our Users Say
-                            </Title>
-                        </div>
-
-                        <Row gutter={[32, 32]} style={{ maxWidth: 1200, margin: '0 auto' }}>
-                            {testimonials.map((testimonial, idx) => (
-                                <Col xs={24} md={8} key={idx}>
-                                    <Card
-                                        bordered={false}
-                                        style={{
-                                            borderRadius: '20px',
-                                            padding: '32px',
-                                            boxShadow: '0 4px 16px rgba(0,0,0,0.05)',
-                                            height: '100%'
-                                        }}
-                                    >
-                                        <Space direction="vertical" style={{ width: '100%' }}>
-                                            <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-                                                {[...Array(testimonial.rating)].map((_, i) => (
-                                                    <StarFilled key={i} style={{ color: '#fadb14', fontSize: 16 }} />
-                                                ))}
-                                            </div>
-                                            <Paragraph style={{ fontSize: '16px', color: '#666', marginBottom: 0 }}>
-                                                "{testimonial.text}"
-                                            </Paragraph>
-                                            <Divider style={{ margin: '16px 0' }} />
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                                <Avatar style={{ backgroundColor: '#e63946', fontSize: 20 }} size={40}>
-                                                    {testimonial.emoji}
-                                                </Avatar>
-                                                <div>
-                                                    <Text strong>{testimonial.name}</Text>
-                                                    <br />
-                                                    <Text type="secondary" style={{ fontSize: '12px' }}>
-                                                        {testimonial.role}
-                                                    </Text>
-                                                </div>
-                                            </div>
-                                        </Space>
-                                    </Card>
-                                </Col>
-                            ))}
-                        </Row>
-                    </section>
-
-                    {/* ============ PRICING SECTION ============ */}
-                    <section id="pricing" style={{ padding: '100px 50px', background: '#f8f9fa' }}>
-                        <div style={{ textAlign: 'center', marginBottom: 60 }}>
-                            <Tag color="magenta">PRICING PLANS</Tag>
-                            <Title level={2} style={{ marginTop: 16 }}>
-                                Choose Your Plan
-                            </Title>
-                            <Paragraph style={{ fontSize: '18px', color: '#666' }}>
-                                Flexible pricing options for every stage of your learning journey
-                            </Paragraph>
-                        </div>
-
-                        <Row gutter={[32, 32]} style={{ maxWidth: 1200, margin: '0 auto' }}>
-                            {pricingPlans.map((plan, idx) => (
-                                <Col xs={24} md={8} key={idx}>
-                                    <Card
-                                        bordered={plan.btnType === 'primary'}
-                                        style={{
-                                            borderRadius: '20px',
-                                            padding: '40px 32px',
-                                            height: '100%',
-                                            position: 'relative',
-                                            boxShadow: plan.btnType === 'primary' ? '0 8px 32px rgba(230, 57, 70, 0.2)' : '0 4px 16px rgba(0,0,0,0.05)',
-                                            transform: plan.btnType === 'primary' ? 'scale(1.05)' : 'scale(1)',
-                                            borderColor: plan.btnType === 'primary' ? '#e63946' : '#d9d9d9'
-                                        }}
-                                    >
-                                        {plan.badge && (
-                                            <Tag color="red" style={{ position: 'absolute', top: -12, right: 24, padding: '4px 12px' }}>
-                                                {plan.badge}
-                                            </Tag>
-                                        )}
-
-                                        <Title level={3}>{plan.name}</Title>
-                                        <Text type="secondary">{plan.desc}</Text>
-
-                                        <div style={{ margin: '32px 0' }}>
-                                            <div style={{ fontSize: '42px', fontWeight: 800, color: '#e63946' }}>
-                                                {plan.price}
-                                            </div>
-                                        </div>
-
-                                        <Space direction="vertical" style={{ width: '100%', marginBottom: 32 }}>
-                                            {plan.features.map((feature, i) => (
-                                                <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                                                    <CheckCircleOutlined style={{ color: '#e63946', marginTop: 4 }} />
-                                                    <Text>{feature}</Text>
-                                                </div>
-                                            ))}
-                                        </Space>
-
-                                        <Button
-                                            type={plan.btnType}
-                                            size="large"
-                                            block
-                                            onClick={() => navigate('/register')}
-                                            style={{ height: 50, borderRadius: '12px', fontWeight: 700 }}
-                                        >
-                                            Get Started
-                                        </Button>
-                                    </Card>
-                                </Col>
-                            ))}
-                        </Row>
-                    </section>
-
-                    {/* ============ FAQ SECTION ============ */}
-                    <section style={{ padding: '100px 50px', background: '#fff' }}>
-                        <div style={{ textAlign: 'center', marginBottom: 60 }}>
-                            <Tag color="gold">FREQUENTLY ASKED</Tag>
-                            <Title level={2} style={{ marginTop: 16 }}>
-                                Common Questions
-                            </Title>
-                        </div>
-
-                        <Collapse
-                            items={faqs}
-                            defaultActiveKey={['1']}
-                            style={{ maxWidth: 900, margin: '0 auto', borderRadius: '12px' }}
-                        />
-                    </section>
-
-                    {/* ============ CTA SECTION ============ */}
-                    <section
-                        style={{
-                            padding: '80px 50px',
-                            background: 'linear-gradient(135deg, #1d3557 0%, #457b9d 100%)',
-                            textAlign: 'center',
-                            color: 'white',
-                            position: 'relative',
-                            overflow: 'hidden'
-                        }}
-                    >
-                        <div
-                            style={{
-                                position: 'absolute',
-                                top: '-20%',
-                                right: '-10%',
-                                width: '500px',
-                                height: '500px',
-                                background: 'rgba(230, 57, 70, 0.1)',
-                                borderRadius: '50%',
-                                filter: 'blur(100px)'
-                            }}
-                        />
-
-                        <div style={{ maxWidth: 800, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-                            <Title level={2} style={{ color: 'white', marginBottom: 24 }}>
-                                Ready to Transform Your Career?
-                            </Title>
-                            <Paragraph style={{ fontSize: '18px', color: 'rgba(255,255,255,0.85)', marginBottom: 32 }}>
-                                Join thousands of successful learners. Start learning today with free courses.
-                            </Paragraph>
-                            <Space size="large">
-                                <Button
-                                    type="primary"
-                                    size="large"
-                                    onClick={() => navigate('/register')}
-                                    style={{
-                                        height: 55,
-                                        padding: '0 40px',
-                                        fontSize: 16,
-                                        background: '#e63946',
-                                        borderRadius: '12px',
-                                        fontWeight: 700
-                                    }}
-                                >
-                                    Sign Up Free <ArrowRightOutlined />
-                                </Button>
-                                <Button
-                                    type="default"
-                                    size="large"
-                                    onClick={() => navigate('/login')}
-                                    style={{
-                                        height: 55,
-                                        padding: '0 40px',
-                                        fontSize: 16,
-                                        borderRadius: '12px',
-                                        fontWeight: 700,
-                                        background: 'rgba(255,255,255,0.1)',
-                                        border: '2px solid rgba(255,255,255,0.3)',
-                                        color: '#fff'
-                                    }}
-                                >
-                                    Sign In
-                                </Button>
-                            </Space>
-                        </div>
-                    </section>
-
-
-                </Content>
-
-                {/* ============ FOOTER ============ */}
-                <Footer style={{ padding: '60px 50px 40px', background: '#1d3557', color: 'rgba(255,255,255,0.6)' }}>
-                    <Row gutter={[40, 40]} style={{ maxWidth: 1200, margin: '0 auto 40px', textAlign: 'left' }}>
-                        <Col xs={24} md={6}>
-                            <Title level={3} style={{ color: '#fff', marginBottom: 24 }}>
-                                LMS<span style={{ color: '#e63946' }}>3.0</span>
-                            </Title>
-                            <Paragraph style={{ color: 'rgba(255,255,255,0.5)', marginBottom: 24 }}>
-                                Transforming education through intelligent, personalized learning experiences.
-                            </Paragraph>
-                            <Space style={{ color: 'rgba(255,255,255,0.5)' }}>
-                                <a href="#" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                                    <LinkedinOutlined style={{ fontSize: 20 }} />
-                                </a>
-                                <a href="#" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                                    <GithubOutlined style={{ fontSize: 20 }} />
-                                </a>
-                                <a href="#" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                                    <TwitterOutlined style={{ fontSize: 20 }} />
-                                </a>
-                            </Space>
-                        </Col>
-
-                        <Col xs={12} md={6}>
-                            <Title level={4} style={{ color: '#fff', fontSize: '16px' }}>Product</Title>
-                            <Space direction="vertical" size={8} style={{ display: 'flex', color: 'rgba(255,255,255,0.5)' }}>
-                                <a href="#features" style={{ color: 'inherit' }}>Features</a>
-                                <a href="#courses" style={{ color: 'inherit' }}>Courses</a>
-                                <a href="#pricing" style={{ color: 'inherit' }}>Pricing</a>
-                                <a href="#" style={{ color: 'inherit' }}>FAQ</a>
-                            </Space>
-                        </Col>
-
-                        <Col xs={12} md={6}>
-                            <Title level={4} style={{ color: '#fff', fontSize: '16px' }}>Company</Title>
-                            <Space direction="vertical" size={8} style={{ display: 'flex', color: 'rgba(255,255,255,0.5)' }}>
-                                <a href="#" style={{ color: 'inherit' }}>About Us</a>
-                                <a href="#" style={{ color: 'inherit' }}>Blog</a>
-                                <a href="#" style={{ color: 'inherit' }}>Careers</a>
-                                <a href="#" style={{ color: 'inherit' }}>Contact</a>
-                            </Space>
-                        </Col>
-
-                        <Col xs={24} md={6}>
-                            <Title level={4} style={{ color: '#fff', fontSize: '16px' }}>Legal</Title>
-                            <Space direction="vertical" size={8} style={{ display: 'flex', color: 'rgba(255,255,255,0.5)' }}>
-                                <a href="#" style={{ color: 'inherit' }}>Privacy Policy</a>
-                                <a href="#" style={{ color: 'inherit' }}>Terms of Service</a>
-                                <a href="#" style={{ color: 'inherit' }}>Cookie Policy</a>
-                                <a href="#" style={{ color: 'inherit' }}>Security</a>
-                            </Space>
-                        </Col>
-                    </Row>
-
-                    <Divider style={{ borderColor: 'rgba(255,255,255,0.1)' }} />
-
-                    <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.4)', paddingTop: 20 }}>
-                        <Text style={{ color: 'rgba(255,255,255,0.4)' }}>
-                            © 2026 LMS 3.0. All rights reserved. | Made with ❤️ for learners worldwide.
-                        </Text>
+                                Browse Modules
+                            </Button>
+                        </Space>
                     </div>
-                </Footer>
+                </section>
 
-                <style>{`
-                    @keyframes fadeInDown {
-                        from { opacity: 0; transform: translateY(-30px); }
-                        to { opacity: 1; transform: translateY(0); }
-                    }
-                    @keyframes fadeInUp {
-                        from { opacity: 0; transform: translateY(30px); }
-                        to { opacity: 1; transform: translateY(0); }
-                    }
-                    @keyframes float {
-                        0%, 100% { transform: translateY(0px); }
-                        50% { transform: translateY(-20px); }
-                    }
-                    html {
-                        scroll-behavior: smooth;
-                    }
-                    .ant-collapse {
-                        background: transparent !important;
-                    }
-                    .ant-collapse-header {
-                        font-weight: 600 !important;
-                        font-size: 16px !important;
-                    }
-                `}</style>
-            </Layout>
-        </ConfigProvider>
+                {/* ============ STATS SECTION ============ */}
+                <section style={{ padding: '80px 24px', background: '#112240', borderBottom: '1px solid rgba(0, 209, 178, 0.1)' }}>
+                    <Row gutter={[40, 40]} style={{ maxWidth: 1200, margin: '0 auto' }} className="fade-in">
+                        {stats.map((stat, idx) => (
+                            <Col xs={24} sm={12} md={6} key={idx}>
+                                <div style={{ textAlign: 'center' }}>
+                                    <div className="glow-text" style={{ fontSize: '48px', fontWeight: 800, marginBottom: 8, color: '#00d1b2' }}>
+                                        {stat.label}
+                                    </div>
+                                    <Text style={{ fontSize: '16px', color: '#8892b0' }}>
+                                        {stat.desc}
+                                    </Text>
+                                </div>
+                            </Col>
+                        ))}
+                    </Row>
+                </section>
+
+                {/* ============ FEATURES SECTION ============ */}
+                <section id="features" style={{ padding: '100px 24px', background: '#0a192f' }}>
+                    <div style={{ textAlign: 'center', marginBottom: 60, maxWidth: 1200, margin: '0 auto' }}>
+                        <Tag color="cyan" style={{ background: 'rgba(0, 209, 178, 0.1)', border: '1px solid rgba(0, 209, 178, 0.2)', fontWeight: 600 }}>SYSTEM CAPABILITIES</Tag>
+                        <Title level={2} style={{ marginTop: 16, marginBottom: 24, color: '#fff' }}>
+                            Advanced Cognitive Enhancements
+                        </Title>
+                        <Paragraph style={{ fontSize: '18px', color: '#8892b0', maxWidth: 600, margin: '0 auto' }}>
+                            Our platform utilizes cutting-edge neural protocols and high-frequency learning modules to accelerate your evolution.
+                        </Paragraph>
+                    </div>
+
+                    <Row gutter={[32, 32]} style={{ maxWidth: 1200, margin: '0 auto' }}>
+                        {features.map((feature, idx) => (
+                            <Col xs={24} md={8} key={idx}>
+                                <Card
+                                    bordered={false}
+                                    className="glass-card"
+                                    style={{ height: '100%', padding: '20px' }}
+                                >
+                                    <div
+                                        className="float-element"
+                                        style={{
+                                            fontSize: 48,
+                                            color: '#00d1b2',
+                                            marginBottom: 24,
+                                            background: 'rgba(0, 209, 178, 0.1)',
+                                            width: '80px',
+                                            height: '80px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            borderRadius: '20px',
+                                            border: '1px solid rgba(0, 209, 178, 0.2)'
+                                        }}
+                                    >
+                                        {feature.icon}
+                                    </div>
+                                    <Title level={4} style={{ color: '#fff' }}>{feature.title}</Title>
+                                    <Text style={{ color: '#8892b0' }}>{feature.desc}</Text>
+                                </Card>
+                            </Col>
+                        ))}
+                    </Row>
+                </section>
+
+                {/* ============ TESTIMONIALS SECTION ============ */}
+                <section style={{ padding: '100px 24px', background: '#112240' }}>
+                    <div style={{ textAlign: 'center', marginBottom: 60 }}>
+                        <Tag color="cyan">SUCCESS STORIES</Tag>
+                        <Title level={2} style={{ marginTop: 16, color: '#fff' }}>
+                            What Our Users Say
+                        </Title>
+                    </div>
+
+                    <Row gutter={[32, 32]} style={{ maxWidth: 1200, margin: '0 auto' }}>
+                        {testimonials.map((testimonial, idx) => (
+                            <Col xs={24} md={8} key={idx}>
+                                <Card
+                                    bordered={false}
+                                    className="glass-card"
+                                    style={{ height: '100%', padding: '12px' }}
+                                >
+                                    <Space direction="vertical" style={{ width: '100%' }}>
+                                        <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+                                            {[...Array(testimonial.rating)].map((_, i) => (
+                                                <StarFilled key={i} style={{ color: '#00d1b2', fontSize: 16 }} />
+                                            ))}
+                                        </div>
+                                        <Paragraph style={{ fontSize: '16px', color: '#ccd6f6', marginBottom: 0, fontStyle: 'italic' }}>
+                                            "{testimonial.text}"
+                                        </Paragraph>
+                                        <Divider style={{ borderColor: 'rgba(0, 209, 178, 0.1)', margin: '16px 0' }} />
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                            <Avatar style={{ backgroundColor: 'rgba(0, 209, 178, 0.2)', color: '#00d1b2', border: '1px solid rgba(0, 209, 178, 0.3)' }} size={40}>
+                                                {testimonial.emoji}
+                                            </Avatar>
+                                            <div>
+                                                <Text strong style={{ color: '#fff' }}>{testimonial.name}</Text>
+                                                <br />
+                                                <Text style={{ fontSize: '12px', color: '#8892b0' }}>
+                                                    {testimonial.role}
+                                                </Text>
+                                            </div>
+                                        </div>
+                                    </Space>
+                                </Card>
+                            </Col>
+                        ))}
+                    </Row>
+                </section>
+
+                {/* ============ PRICING SECTION ============ */}
+                <section id="pricing" style={{ padding: '100px 24px', background: '#0a192f' }}>
+                    <div style={{ textAlign: 'center', marginBottom: 60 }}>
+                        <Tag color="cyan">PRICING PLANS</Tag>
+                        <Title level={2} style={{ marginTop: 16, color: '#fff' }}>
+                            Choose Your Plan
+                        </Title>
+                        <Paragraph style={{ fontSize: '18px', color: '#8892b0' }}>
+                            Flexible pricing options for every stage of your learning journey
+                        </Paragraph>
+                    </div>
+
+                    <Row gutter={[32, 32]} style={{ maxWidth: 1200, margin: '0 auto', alignItems: 'center' }}>
+                        {pricingPlans.map((plan, idx) => (
+                            <Col xs={24} md={8} key={idx}>
+                                <Card
+                                    bordered={plan.btnType === 'primary'}
+                                    className="glass-card"
+                                    style={{
+                                        padding: '20px',
+                                        height: '100%',
+                                        position: 'relative',
+                                        transform: plan.btnType === 'primary' ? 'scale(1.05)' : 'scale(1)',
+                                        borderColor: plan.btnType === 'primary' ? '#00d1b2' : 'rgba(0, 209, 178, 0.1)',
+                                        zIndex: plan.btnType === 'primary' ? 2 : 1,
+                                        boxShadow: plan.btnType === 'primary' ? '0 20px 40px rgba(0, 209, 178, 0.15)' : 'none'
+                                    }}
+                                >
+                                    {plan.badge && (
+                                        <Tag color="cyan" style={{ position: 'absolute', top: -12, right: 24, padding: '4px 12px', borderRadius: '10px' }}>
+                                            {plan.badge}
+                                        </Tag>
+                                    )}
+
+                                    <Title level={3} style={{ color: '#fff' }}>{plan.name}</Title>
+                                    <Text style={{ color: '#8892b0' }}>{plan.desc}</Text>
+
+                                    <div style={{ margin: '32px 0' }}>
+                                        <div style={{ fontSize: '42px', fontWeight: 800, color: '#00d1b2' }}>
+                                            {plan.price}
+                                        </div>
+                                    </div>
+
+                                    <Space direction="vertical" style={{ width: '100%', marginBottom: 32 }}>
+                                        {plan.features.map((feature, i) => (
+                                            <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                                                <CheckCircleOutlined style={{ color: '#00d1b2', marginTop: 4 }} />
+                                                <Text style={{ color: '#ccd6f6' }}>{feature}</Text>
+                                            </div>
+                                        ))}
+                                    </Space>
+
+                                    <Button
+                                        type={plan.btnType}
+                                        size="large"
+                                        block
+                                        onClick={() => navigate('/register')}
+                                        style={{
+                                            height: 50,
+                                            borderRadius: '12px',
+                                            fontWeight: 700,
+                                            background: plan.btnType === 'primary' ? '#00d1b2' : 'transparent',
+                                            borderColor: '#00d1b2',
+                                            color: plan.btnType === 'primary' ? '#0a192f' : '#00d1b2'
+                                        }}
+                                    >
+                                        Get Started
+                                    </Button>
+                                </Card>
+                            </Col>
+                        ))}
+                    </Row>
+                </section>
+
+                {/* ============ FAQ SECTION ============ */}
+                <section style={{ padding: '100px 24px', background: '#112240' }}>
+                    <div style={{ textAlign: 'center', marginBottom: 60 }}>
+                        <Tag color="cyan" style={{ background: 'rgba(0, 209, 178, 0.1)', border: '1px solid rgba(0, 209, 178, 0.2)' }}>FREQUENTLY ASKED</Tag>
+                        <Title level={2} style={{ marginTop: 16, color: '#fff' }}>
+                            Common Questions
+                        </Title>
+                    </div>
+
+                    <Collapse
+                        items={faqs}
+                        defaultActiveKey={['1']}
+                        style={{
+                            maxWidth: 900,
+                            margin: '0 auto',
+                            background: 'rgba(10, 25, 47, 0.4)',
+                            border: '1px solid rgba(0, 209, 178, 0.1)',
+                            borderRadius: '12px'
+                        }}
+                    />
+                </section>
+
+                {/* ============ CTA SECTION ============ */}
+                <section
+                    style={{
+                        padding: '100px 24px',
+                        background: 'radial-gradient(circle at center, #112240 0%, #0a192f 100%)',
+                        textAlign: 'center',
+                        color: 'white',
+                        position: 'relative',
+                        overflow: 'hidden',
+                        borderTop: '1px solid rgba(0, 209, 178, 0.1)'
+                    }}
+                >
+                    <div style={{ maxWidth: 800, margin: '0 auto', position: 'relative', zIndex: 1 }}>
+                        <Title level={2} style={{ color: 'white', marginBottom: 24 }}>
+                            Ready to Transform Your Career?
+                        </Title>
+                        <Paragraph style={{ fontSize: '18px', color: '#8892b0', marginBottom: 32 }}>
+                            Join thousands of successful learners. Start learning today with free courses in a cutting-edge environment.
+                        </Paragraph>
+                        <Space size="large" wrap justify="center">
+                            <Button
+                                type="primary"
+                                size="large"
+                                onClick={() => navigate('/register')}
+                                style={{
+                                    height: 55,
+                                    padding: '0 40px',
+                                    fontSize: 16,
+                                    borderRadius: '12px',
+                                    fontWeight: 700,
+                                    boxShadow: '0 8px 20px rgba(0, 209, 178, 0.3)'
+                                }}
+                            >
+                                Sign Up Free <ArrowRightOutlined />
+                            </Button>
+                            <Button
+                                type="default"
+                                size="large"
+                                onClick={() => navigate('/login')}
+                                style={{
+                                    height: 55,
+                                    padding: '0 40px',
+                                    fontSize: 16,
+                                    borderRadius: '12px',
+                                    fontWeight: 700,
+                                    background: 'rgba(255,255,255,0.05)',
+                                    border: '1px solid rgba(0, 209, 178, 0.3)',
+                                    color: '#00d1b2'
+                                }}
+                            >
+                                Sign In
+                            </Button>
+                        </Space>
+                    </div>
+                </section>
+            </Content>
+
+            {/* ============ FOOTER ============ */}
+            <Footer style={{ padding: '80px 24px 40px', background: '#0a192f', color: '#8892b0', borderTop: '1px solid rgba(0, 209, 178, 0.1)' }}>
+                <Row gutter={[40, 40]} style={{ maxWidth: 1200, margin: '0 auto 40px', textAlign: 'left' }}>
+                    <Col xs={24} md={6}>
+                        <Title level={3} style={{ color: '#fff', marginBottom: 24 }}>
+                            LMS<span style={{ color: '#00d1b2' }}>3.0</span>
+                        </Title>
+                        <Paragraph style={{ color: '#8892b0', marginBottom: 24 }}>
+                            Transforming education through intelligent, personalized learning experiences in a state-of-the-art environment.
+                        </Paragraph>
+                        <Space size="middle">
+                            <a href="#" style={{ color: '#00d1b2', fontSize: 20 }}><LinkedinOutlined /></a>
+                            <a href="#" style={{ color: '#00d1b2', fontSize: 20 }}><GithubOutlined /></a>
+                            <a href="#" style={{ color: '#00d1b2', fontSize: 20 }}><TwitterOutlined /></a>
+                        </Space>
+                    </Col>
+
+                    <Col xs={12} md={6}>
+                        <Title level={4} style={{ color: '#fff', fontSize: '16px' }}>Product</Title>
+                        <Space direction="vertical" size={8} style={{ display: 'flex' }}>
+                            <a href="#features" style={{ color: '#8892b0' }}>Features</a>
+                            <a href="#courses" style={{ color: '#8892b0' }}>Courses</a>
+                            <a href="#pricing" style={{ color: '#8892b0' }}>Pricing</a>
+                            <a href="#" style={{ color: '#8892b0' }}>FAQ</a>
+                        </Space>
+                    </Col>
+
+                    <Col xs={12} md={6}>
+                        <Title level={4} style={{ color: '#fff', fontSize: '16px' }}>Company</Title>
+                        <Space direction="vertical" size={8} style={{ display: 'flex' }}>
+                            <a href="#" style={{ color: '#8892b0' }}>About Us</a>
+                            <a href="#" style={{ color: '#8892b0' }}>Blog</a>
+                            <a href="#" style={{ color: '#8892b0' }}>Careers</a>
+                            <a href="#" style={{ color: '#8892b0' }}>Contact</a>
+                        </Space>
+                    </Col>
+
+                    <Col xs={24} md={6}>
+                        <Title level={4} style={{ color: '#fff', fontSize: '16px' }}>Legal</Title>
+                        <Space direction="vertical" size={8} style={{ display: 'flex' }}>
+                            <a href="#" style={{ color: '#8892b0' }}>Privacy Policy</a>
+                            <a href="#" style={{ color: '#8892b0' }}>Terms of Service</a>
+                            <a href="#" style={{ color: '#8892b0' }}>Cookie Policy</a>
+                        </Space>
+                    </Col>
+                </Row>
+
+                <Divider style={{ borderColor: 'rgba(0, 209, 178, 0.1)' }} />
+
+                <div style={{ textAlign: 'center', paddingTop: 20 }}>
+                    <Text style={{ color: '#465a75', fontSize: '12px' }}>
+                        © 2026 LMS 3.0. All rights reserved. | Syncing the future of humanity.
+                    </Text>
+                </div>
+            </Footer>
+
+        </Layout>
     );
 };
 

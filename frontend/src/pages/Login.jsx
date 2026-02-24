@@ -79,11 +79,11 @@ const Login = () => {
             justifyContent: 'center',
             alignItems: 'center',
             height: '100vh',
-            background: 'linear-gradient(135deg, #1d3557 0%, #457b9d 100%)',
+            background: 'radial-gradient(circle at top right, rgba(0, 209, 178, 0.1), transparent), #0a192f',
             padding: '20px'
         }}>
             <Card
-                className="glass-card"
+                className="glass-card fade-in"
                 style={{
                     width: '100%',
                     maxWidth: 420,
@@ -92,8 +92,8 @@ const Login = () => {
                 }}
             >
                 <div style={{ textAlign: 'center', marginBottom: 40 }}>
-                    <Title level={1} style={{ margin: 0, color: '#1d3557', fontSize: 32 }}>LMS</Title>
-                    <Text type="secondary" style={{ fontSize: 16 }}>Autonomous Learning Protocol</Text>
+                    <Title level={1} className="glow-text" style={{ margin: 0, fontSize: 32 }}>LMS</Title>
+                    <Text style={{ fontSize: 16, color: '#8892b0' }}>Autonomous Learning Protocol</Text>
                 </div>
 
                 <Form
@@ -122,7 +122,7 @@ const Login = () => {
                         <div
                             dangerouslySetInnerHTML={{ __html: captcha.data }}
                             onClick={fetchCaptcha}
-                            style={{ cursor: 'pointer', marginBottom: 8, textAlign: 'center', background: '#fff', borderRadius: 8, padding: 4 }}
+                            style={{ cursor: 'pointer', marginBottom: 8, textAlign: 'center', background: 'rgba(255, 255, 255, 0.05)', borderRadius: 8, padding: '8px', border: '1px solid rgba(0, 209, 178, 0.1)' }}
                             title="Click to refresh captcha"
                         />
                         <Form.Item
@@ -146,7 +146,7 @@ const Login = () => {
                     </Form.Item>
 
                     <div style={{ marginBottom: 24, textAlign: 'right' }}>
-                        <Link to="/forgot-password" style={{ color: '#1d3557', fontSize: 13 }}>Forgot Password?</Link>
+                        <Link to="/forgot-password" style={{ color: '#00d1b2', fontSize: 13 }}>Forgot Password?</Link>
                     </div>
 
                     <Form.Item>
@@ -157,14 +157,15 @@ const Login = () => {
                             icon={<ArrowRightOutlined />}
                             loading={loading}
                             disabled={loading}
+                            className="pulse-glow"
                         >
                             {loading ? 'Authenticating...' : 'Access Dashboard'}
                         </Button>
                     </Form.Item>
 
                     <div style={{ textAlign: 'center', marginTop: 20 }}>
-                        <Text type="secondary">New Participant? </Text>
-                        <Link to="/register" style={{ fontWeight: 600, color: '#e63946' }}>Initialize Identity</Link>
+                        <Text style={{ color: '#8892b0' }}>New Participant? </Text>
+                        <Link to="/register" style={{ fontWeight: 600, color: '#00d1b2' }}>Initialize Identity</Link>
                     </div>
                 </Form>
             </Card>

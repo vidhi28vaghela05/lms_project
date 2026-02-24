@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Layout, ConfigProvider, theme as antdTheme } from 'antd';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import LandingPage from './pages/LandingPage';
@@ -191,11 +192,42 @@ function AppRoutes() {
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <AppRoutes />
-      </Router>
-    </AuthProvider>
+    <ConfigProvider
+      theme={{
+        algorithm: antdTheme.darkAlgorithm,
+        token: {
+          colorPrimary: '#00d1b2',
+          colorBgBase: '#0a192f',
+          colorBgContainer: '#112240',
+          colorTextBase: '#ccd6f6',
+          borderRadius: 12,
+          fontFamily: "'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+        },
+        components: {
+          Layout: {
+            headerBg: '#0a192f',
+            siderBg: '#0a192f',
+            bodyBg: '#0a192f',
+            colorBgLayout: '#0a192f',
+          },
+          Button: {
+            borderRadius: 8,
+            controlHeight: 40,
+            colorPrimary: '#00d1b2',
+          },
+          Card: {
+            colorBgContainer: 'rgba(17, 34, 64, 0.7)',
+            boxShadowCard: '0 8px 32px rgba(0, 0, 0, 0.4)',
+          }
+        }
+      }}
+    >
+      <AuthProvider>
+        <Router>
+          <AppRoutes />
+        </Router>
+      </AuthProvider>
+    </ConfigProvider>
   );
 }
 

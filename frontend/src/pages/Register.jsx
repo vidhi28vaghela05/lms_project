@@ -64,11 +64,11 @@ const Register = () => {
             justifyContent: 'center',
             alignItems: 'center',
             height: '100vh',
-            background: 'linear-gradient(135deg, #1d3557 0%, #457b9d 100%)',
+            background: 'radial-gradient(circle at top right, rgba(0, 209, 178, 0.1), transparent), #0a192f',
             padding: '20px'
         }}>
             <Card
-                className="glass-card"
+                className="glass-card fade-in"
                 style={{
                     width: '100%',
                     maxWidth: 480,
@@ -77,8 +77,8 @@ const Register = () => {
                 }}
             >
                 <div style={{ textAlign: 'center', marginBottom: 32 }}>
-                    <Title level={2} style={{ margin: 0, color: '#1d3557' }}>Initialize Identity</Title>
-                    <Text type="secondary">Join the LMS Autonomous Network</Text>
+                    <Title level={2} className="glow-text" style={{ margin: 0 }}>Initialize Identity</Title>
+                    <Text style={{ color: '#8892b0' }}>Join the LMS Autonomous Network</Text>
                 </div>
 
                 <Form
@@ -149,7 +149,7 @@ const Register = () => {
                         <div
                             dangerouslySetInnerHTML={{ __html: captcha.data }}
                             onClick={fetchCaptcha}
-                            style={{ cursor: 'pointer', marginBottom: 8, textAlign: 'center', background: '#fff', borderRadius: 8, padding: 4 }}
+                            style={{ cursor: 'pointer', marginBottom: 8, textAlign: 'center', background: 'rgba(255, 255, 255, 0.05)', borderRadius: 8, padding: '8px', border: '1px solid rgba(0, 209, 178, 0.1)' }}
                             title="Click to refresh captcha"
                         />
                         <Form.Item
@@ -167,14 +167,15 @@ const Register = () => {
                             block
                             icon={<RocketOutlined />}
                             loading={loading}
+                            className="pulse-glow"
                         >
                             Initialize
                         </Button>
                     </Form.Item>
 
                     <div style={{ textAlign: 'center', marginTop: 16 }}>
-                        <Text type="secondary">Already Enlisted? </Text>
-                        <Link to="/login" style={{ fontWeight: 600, color: '#1d3557' }}>Access Portal</Link>
+                        <Text style={{ color: '#8892b0' }}>Already Enlisted? </Text>
+                        <Link to="/login" style={{ fontWeight: 600, color: '#00d1b2' }}>Access Portal</Link>
                     </div>
                 </Form>
             </Card>

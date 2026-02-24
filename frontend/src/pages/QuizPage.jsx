@@ -61,46 +61,119 @@ const QuizPage = () => {
 
     if (result) {
         return (
-            <Card style={{ maxWidth: 600, margin: '50px auto', textAlign: 'center', borderRadius: 16 }}>
-                <Result
-                    status={result.passed ? "success" : "warning"}
-                    title={`Your Score: ${result.percentage}%`}
-                    subTitle={result.passed ? "Next-level content unlocked!" : "Try again to unlock the next level."}
-                    extra={[
-                        <Button type="primary" key="dashboard" onClick={() => navigate('/dashboard')}>
-                            Go to Dashboard
-                        </Button>
-                    ]}
-                />
-            </Card>
+            <div style={{ padding: '60px 24px' }} className="fade-in">
+                <Card
+                    className="glass-card"
+                    style={{
+                        maxWidth: 600,
+                        margin: '0 auto',
+                        textAlign: 'center',
+                        borderRadius: 24,
+                        background: 'rgba(17, 34, 64, 0.7)',
+                        border: '1px solid rgba(0, 209, 178, 0.1)',
+                        padding: '40px 24px'
+                    }}
+                >
+                    <Result
+                        status={result.passed ? "success" : "warning"}
+                        title={<span style={{ color: '#fff', fontSize: '32px' }}>Neural Sync: {result.percentage}%</span>}
+                        subTitle={<span style={{ color: '#8892b0', fontSize: '18px' }}>{result.passed ? "Cognitive Lock Released: Access Granted" : "Interference Detected: Insufficient Precision"}</span>}
+                        extra={[
+                            <Button
+                                type="primary"
+                                key="dashboard"
+                                size="large"
+                                onClick={() => navigate('/dashboard')}
+                                style={{ background: '#00d1b2', border: 'none', color: '#0a192f', fontWeight: 600, borderRadius: 12, height: 50, padding: '0 40px' }}
+                            >
+                                Return to Command Center
+                            </Button>
+                        ]}
+                    />
+                </Card>
+            </div>
         );
     }
 
     const currentQuiz = quizzes[currentIdx];
 
     return (
-        <div style={{ maxWidth: 800, margin: '40px auto' }}>
-            <Progress percent={Math.round(((currentIdx + 1) / quizzes.length) * 100)} showInfo={false} />
+        <div style={{ maxWidth: 800, margin: '60px auto', padding: '0 24px' }} className="fade-in">
+            <div style={{ marginBottom: 32 }}>
+                <Title level={3} className="glow-text" style={{ marginBottom: 16 }}>Evaluation Sequence</Title>
+                <Progress
+                    percent={Math.round(((currentIdx + 1) / quizzes.length) * 100)}
+                    strokeColor="#00d1b2"
+                    trailColor="rgba(255, 255, 255, 0.05)"
+                    strokeWidth={12}
+                    showInfo={false}
+                />
+            </div>
+
             <Card
-                title={<Space><Text type="secondary">Question {currentIdx + 1} of {quizzes.length}</Text></Space>}
-                style={{ marginTop: 20, borderRadius: 16, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
+                className="glass-card"
+                title={<Space><Text style={{ color: '#8892b0' }}>Fragment {currentIdx + 1} of {quizzes.length}</Text></Space>}
+                style={{
+                    marginTop: 20,
+                    borderRadius: 20,
+                    background: 'rgba(17, 34, 64, 0.6)',
+                    border: '1px solid rgba(0, 209, 178, 0.1)',
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
+                }}
             >
-                <Title level={4}>{currentQuiz.question}</Title>
-                <Radio.Group onChange={handleAnswer} value={answers[currentIdx]} style={{ width: '100%', marginTop: 20 }}>
-                    <Space direction="vertical" style={{ width: '100%' }}>
+                <Title level={3} style={{ color: '#ccd6f6', marginBottom: 32, lineHeight: 1.5 }}>{currentQuiz.question}</Title>
+                <Radio.Group onChange={handleAnswer} value={answers[currentIdx]} style={{ width: '100%' }}>
+                    <Space direction="vertical" style={{ width: '100%' }} size="middle">
                         {currentQuiz.options.map((opt, i) => (
-                            <Radio.Button key={i} value={opt} style={{ width: '100%', textAlign: 'left', borderRadius: 8, height: 'auto', padding: '12px' }}>
+                            <Radio.Button
+                                key={i}
+                                value={opt}
+                                style={{
+                                    width: '100%',
+                                    textAlign: 'left',
+                                    borderRadius: 12,
+                                    height: 'auto',
+                                    padding: '16px 24px',
+                                    background: answers[currentIdx] === opt ? 'rgba(0, 209, 178, 0.1)' : 'rgba(10, 25, 47, 0.5)',
+                                    border: answers[currentIdx] === opt ? '1px solid #00d1b2' : '1px solid rgba(0, 209, 178, 0.1)',
+                                    color: answers[currentIdx] === opt ? '#00d1b2' : '#ccd6f6',
+                                    fontSize: '16px',
+                                    transition: 'all 0.3s'
+                                }}
+                            >
                                 {opt}
                             </Radio.Button>
                         ))}
                     </Space>
                 </Radio.Group>
-                <div style={{ marginTop: 40, display: 'flex', justifyContent: 'space-between' }}>
-                    <Button disabled={currentIdx === 0} onClick={() => setCurrentIdx(currentIdx - 1)}>Previous</Button>
+                <div style={{ marginTop: 48, display: 'flex', justifyContent: 'space-between' }}>
+                    <Button
+                        disabled={currentIdx === 0}
+                        onClick={() => setCurrentIdx(currentIdx - 1)}
+                        style={{ background: 'rgba(255, 255, 255, 0.05)', color: '#ccd6f6', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: 8 }}
+                    >
+                        Previous Fragment
+                    </Button>
                     {currentIdx === quizzes.length - 1 ? (
-                        <Button type="primary" onClick={handleSubmit} disabled={!answers[currentIdx]}>Submit Quiz</Button>
+                        <Button
+                            type="primary"
+                            size="large"
+                            onClick={handleSubmit}
+                            disabled={!answers[currentIdx]}
+                            style={{ background: '#00d1b2', border: 'none', color: '#0a192f', fontWeight: 700, borderRadius: 8, padding: '0 32px' }}
+                        >
+                            Finalize Evaluation
+                        </Button>
                     ) : (
-                        <Button type="primary" onClick={() => setCurrentIdx(currentIdx + 1)} disabled={!answers[currentIdx]}>Next</Button>
+                        <Button
+                            type="primary"
+                            size="large"
+                            onClick={() => setCurrentIdx(currentIdx + 1)}
+                            disabled={!answers[currentIdx]}
+                            style={{ background: '#00d1b2', border: 'none', color: '#0a192f', fontWeight: 700, borderRadius: 8, padding: '0 32px' }}
+                        >
+                            Next Fragment
+                        </Button>
                     )}
                 </div>
             </Card>

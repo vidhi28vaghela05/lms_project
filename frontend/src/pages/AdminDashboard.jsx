@@ -212,49 +212,49 @@ const AdminDashboard = () => {
     ];
 
     return (
-        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', background: 'transparent' }} className="fade-in">
             <div style={{ marginBottom: 32 }}>
-                <Title level={2} style={{ color: '#1d3557' }}>System Overview</Title>
-                <Text type="secondary">Global administrative control and system health monitoring.</Text>
+                <Title level={2} className="glow-text" style={{ marginBottom: 8 }}>System Overview</Title>
+                <Text style={{ color: '#8892b0' }}>Global administrative control and system health monitoring.</Text>
             </div>
 
             <Row gutter={[24, 24]} style={{ marginBottom: 24 }}>
                 <Col xs={12} sm={4}>
-                    <Card bordered={false} style={{ borderRadius: 16 }}>
-                        <Statistic title="Students" value={stats.totalStudents} prefix={<UserOutlined />} />
+                    <Card className="glass-card" bordered={false} style={{ borderRadius: 16, background: 'rgba(17, 34, 64, 0.6)' }}>
+                        <Statistic title={<span style={{ color: '#8892b0' }}>Students</span>} value={stats.totalStudents} prefix={<UserOutlined style={{ color: '#00d1b2' }} />} valueStyle={{ color: '#ccd6f6' }} />
                     </Card>
                 </Col>
                 <Col xs={12} sm={4}>
-                    <Card bordered={false} style={{ borderRadius: 16 }}>
-                        <Statistic title="Instructors" value={stats.totalInstructors} prefix={<SafetyOutlined />} />
+                    <Card className="glass-card" bordered={false} style={{ borderRadius: 16, background: 'rgba(17, 34, 64, 0.6)' }}>
+                        <Statistic title={<span style={{ color: '#8892b0' }}>Instructors</span>} value={stats.totalInstructors} prefix={<SafetyOutlined style={{ color: '#00d1b2' }} />} valueStyle={{ color: '#ccd6f6' }} />
                     </Card>
                 </Col>
                 <Col xs={12} sm={4}>
-                    <Card bordered={false} style={{ borderRadius: 16 }}>
-                        <Statistic title="Courses" value={stats.totalCourses} prefix={<AppstoreOutlined />} />
+                    <Card className="glass-card" bordered={false} style={{ borderRadius: 16, background: 'rgba(17, 34, 64, 0.6)' }}>
+                        <Statistic title={<span style={{ color: '#8892b0' }}>Courses</span>} value={stats.totalCourses} prefix={<AppstoreOutlined style={{ color: '#00d1b2' }} />} valueStyle={{ color: '#ccd6f6' }} />
                     </Card>
                 </Col>
                 <Col xs={24} sm={6}>
-                    <Card bordered={false} className="glass-card" style={{ borderRadius: 16 }}>
-                        <Statistic title="Total Revenue" value={stats.totalRevenue} prefix="$" valueStyle={{ color: '#3f8600' }} />
+                    <Card bordered={false} className="glass-card" style={{ borderRadius: 16, background: 'rgba(17, 34, 64, 0.7)', border: '1px solid rgba(0, 209, 178, 0.1)' }}>
+                        <Statistic title={<span style={{ color: '#8892b0' }}>Total Revenue</span>} value={stats.totalRevenue} prefix="$" valueStyle={{ color: '#00d1b2', fontWeight: 700, textShadow: '0 0 10px rgba(0, 209, 178, 0.3)' }} />
                     </Card>
                 </Col>
                 <Col xs={24} sm={6}>
-                    <Card bordered={false} className="glass-card" style={{ borderRadius: 16, border: '1px solid #e63946' }}>
-                        <Statistic title="Instructor Payables" value={stats.totalPayable} prefix="$" valueStyle={{ color: '#e63946' }} />
+                    <Card bordered={false} className="glass-card" style={{ borderRadius: 16, background: 'rgba(17, 34, 64, 0.7)', border: '1px solid rgba(230, 57, 70, 0.2)' }}>
+                        <Statistic title={<span style={{ color: '#8892b0' }}>Instructor Payables</span>} value={stats.totalPayable} prefix="$" valueStyle={{ color: '#ff4d4f', fontWeight: 700 }} />
                     </Card>
                 </Col>
             </Row>
 
             <Row gutter={[24, 24]} style={{ marginBottom: 24 }}>
                 <Col xs={24} sm={12}>
-                    <Card bordered={false} className="glass-card" style={{ borderRadius: 16 }}>
-                        <Statistic title="Today's Commission" value={stats.todayIncome} prefix="$" valueStyle={{ color: '#1d3557' }} />
+                    <Card bordered={false} className="glass-card" style={{ borderRadius: 16, background: 'rgba(17, 34, 64, 0.6)' }}>
+                        <Statistic title={<span style={{ color: '#8892b0' }}>Today's Commission</span>} value={stats.todayIncome} prefix="$" valueStyle={{ color: '#00d1b2' }} />
                     </Card>
                 </Col>
                 <Col xs={24} sm={12}>
-                    <Card bordered={false} className="glass-card" style={{ borderRadius: 16 }}>
-                        <Statistic title="Monthly Commission" value={stats.monthIncome} prefix="$" valueStyle={{ color: '#457b9d' }} />
+                    <Card bordered={false} className="glass-card" style={{ borderRadius: 16, background: 'rgba(17, 34, 64, 0.6)' }}>
+                        <Statistic title={<span style={{ color: '#8892b0' }}>Monthly Commission</span>} value={stats.monthIncome} prefix="$" valueStyle={{ color: '#00d1b2' }} />
                     </Card>
                 </Col>
             </Row>
@@ -263,32 +263,37 @@ const AdminDashboard = () => {
                 activeKey={activeTab}
                 onChange={(key) => {
                     setActiveTab(key);
-                    // Sync URL if needed
                     if (key === '8') navigate('/manage-users');
                     else if (key === '9') navigate('/system-stats');
                     else if (key === '1') navigate('/dashboard');
                 }}
                 className="custom-tabs"
+                style={{ color: '#ccd6f6' }}
             >
-                <TabPane tab="Instructors Vetting" key="1">
-                    <Card title="Pending Instructor Approvals" style={{ borderRadius: 16 }}>
+                <TabPane tab={<span style={{ color: activeTab === '1' ? '#00d1b2' : '#8892b0' }}>Instructors Vetting</span>} key="1">
+                    <Card title={<span style={{ color: '#ccd6f6' }}>Pending Instructor Approvals</span>} className="glass-card" style={{ background: 'rgba(17, 34, 64, 0.7)' }}>
                         <Table
+                            className="custom-dark-table"
                             dataSource={pendingInstructors}
                             columns={[
-                                ...userColumns,
+                                ...userColumns.map(col => ({
+                                    ...col,
+                                    title: <span style={{ color: '#8892b0' }}>{col.title}</span>
+                                })),
                                 {
-                                    title: 'Bio/Request',
+                                    title: <span style={{ color: '#8892b0' }}>Bio/Request</span>,
                                     dataIndex: 'registrationDescription',
                                     key: 'bio',
-                                    ellipsis: true
+                                    ellipsis: true,
+                                    render: (t) => <span style={{ color: '#8892b0' }}>{t}</span>
                                 },
                                 {
-                                    title: 'Actions',
+                                    title: <span style={{ color: '#8892b0' }}>Actions</span>,
                                     key: 'actions',
                                     render: (_, record) => (
                                         <Space>
-                                            <Button type="primary" onClick={() => approveInstructor(record._id)}>Approve</Button>
-                                            <Button danger onClick={() => api.post('/admin/approve-instructor', { userId: record._id, status: 'rejected' }).then(fetchData)}>Reject</Button>
+                                            <Button type="primary" style={{ background: '#00d1b2', border: 'none', color: '#0a192f' }} onClick={() => approveInstructor(record._id)}>Approve</Button>
+                                            <Button danger style={{ background: 'transparent', border: '1px solid #e63946', color: '#e63946' }} onClick={() => api.post('/admin/approve-instructor', { userId: record._id, status: 'rejected' }).then(fetchData)}>Reject</Button>
                                         </Space>
                                     )
                                 }
@@ -297,27 +302,27 @@ const AdminDashboard = () => {
                         />
                     </Card>
                 </TabPane>
-                <TabPane tab="Course Approvals" key="2">
-                    <Card title="New Courses & Update Requests" style={{ borderRadius: 16 }}>
-                        <Table dataSource={pendingCourses} columns={[
-                            { title: 'Title', dataIndex: 'title', key: 'title' },
-                            { title: 'Instructor', dataIndex: ['instructorId', 'name'], key: 'instructor' },
+                <TabPane tab={<span style={{ color: activeTab === '2' ? '#00d1b2' : '#8892b0' }}>Course Approvals</span>} key="2">
+                    <Card title={<span style={{ color: '#ccd6f6' }}>New Courses & Update Requests</span>} className="glass-card" style={{ background: 'rgba(17, 34, 64, 0.7)' }}>
+                        <Table dataSource={pendingCourses} className="custom-dark-table" columns={[
+                            { title: <span style={{ color: '#8892b0' }}>Title</span>, dataIndex: 'title', key: 'title', render: (t) => <span style={{ color: '#ccd6f6' }}>{t}</span> },
+                            { title: <span style={{ color: '#8892b0' }}>Instructor</span>, dataIndex: ['instructorId', 'name'], key: 'instructor', render: (t) => <span style={{ color: '#ccd6f6' }}>{t}</span> },
                             {
-                                title: 'Type',
+                                title: <span style={{ color: '#8892b0' }}>Type</span>,
                                 key: 'type',
                                 render: (_, record) => !record.isApproved ? <Tag color="orange">NEW COURSE</Tag> : <Tag color="purple">UPDATE REQ</Tag>
                             },
                             {
-                                title: 'Actions',
+                                title: <span style={{ color: '#8892b0' }}>Actions</span>,
                                 key: 'actions',
                                 render: (_, record) => (
                                     <Space>
                                         {!record.isApproved ? (
-                                            <Button type="primary" size="small" onClick={() => approveCourse(record._id)}>Approve New</Button>
+                                            <Button type="primary" size="small" style={{ background: '#00d1b2', border: 'none', color: '#0a192f' }} onClick={() => approveCourse(record._id)}>Approve New</Button>
                                         ) : (
                                             <>
-                                                <Button type="primary" size="small" onClick={() => handleUpdate(record._id, 'approve')}>Approve Update</Button>
-                                                <Button danger size="small" onClick={() => handleUpdate(record._id, 'reject')}>Reject Update</Button>
+                                                <Button type="primary" size="small" style={{ background: '#00d1b2', border: 'none', color: '#0a192f' }} onClick={() => handleUpdate(record._id, 'approve')}>Approve Update</Button>
+                                                <Button danger size="small" style={{ background: 'transparent', border: '1px solid #e63946', color: '#e63946' }} onClick={() => handleUpdate(record._id, 'reject')}>Reject Update</Button>
                                             </>
                                         )}
                                     </Space>
@@ -326,22 +331,23 @@ const AdminDashboard = () => {
                         ]} rowKey="_id" />
                     </Card>
                 </TabPane>
-                <TabPane tab="Financial Payouts" key="4">
-                    <Card title="Instructor Payout Management" style={{ borderRadius: 16 }}>
+                <TabPane tab={<span style={{ color: activeTab === '4' ? '#00d1b2' : '#8892b0' }}>Financial Payouts</span>} key="4">
+                    <Card title={<span style={{ color: '#ccd6f6' }}>Instructor Payout Management</span>} className="glass-card" style={{ background: 'rgba(17, 34, 64, 0.7)' }}>
                         <Table
                             dataSource={users.filter(u => u.role === 'instructor')}
                             columns={[
-                                { title: 'Instructor', dataIndex: 'name' },
-                                { title: 'UPI ID', dataIndex: 'upiId' },
-                                { title: 'Payable Amount', dataIndex: 'payableAmount', render: (val) => <Text strong style={{ color: '#e63946' }}>${val}</Text> },
+                                { title: <span style={{ color: '#8892b0' }}>Instructor</span>, dataIndex: 'name', render: (t) => <span style={{ color: '#ccd6f6' }}>{t}</span> },
+                                { title: <span style={{ color: '#8892b0' }}>UPI ID</span>, dataIndex: 'upiId', render: (t) => <span style={{ color: '#8892b0' }}>{t}</span> },
+                                { title: <span style={{ color: '#8892b0' }}>Payable Amount</span>, dataIndex: 'payableAmount', render: (val) => <Text strong style={{ color: '#e63946' }}>${val}</Text> },
                                 {
-                                    title: 'Actions',
+                                    title: <span style={{ color: '#8892b0' }}>Actions</span>,
                                     key: 'actions',
                                     render: (_, record) => (
                                         <Button
                                             type="primary"
                                             disabled={record.payableAmount <= 0}
                                             icon={<QrcodeOutlined />}
+                                            style={{ background: '#00d1b2', border: 'none', color: '#0a192f', fontWeight: 600 }}
                                             onClick={() => { setSelectedInstructor(record); payoutForm.setFieldsValue({ instructorId: record._id, amount: record.payableAmount }); setIsPayoutModalOpen(true); }}
                                         >
                                             Generate Payout
@@ -353,87 +359,38 @@ const AdminDashboard = () => {
                         />
                     </Card>
                 </TabPane>
-                <TabPane tab="Platform History" key="5">
-                    <Card title="Recent Instructor Payouts" style={{ borderRadius: 16 }}>
+                <TabPane tab={<span style={{ color: activeTab === '5' ? '#00d1b2' : '#8892b0' }}>Platform History</span>} key="5">
+                    <Card title={<span style={{ color: '#ccd6f6' }}>Recent Instructor Payouts</span>} className="glass-card" style={{ background: 'rgba(17, 34, 64, 0.7)' }}>
                         <Table
                             dataSource={payouts}
                             columns={[
-                                { title: 'Date', dataIndex: 'payoutDate', render: (d) => new Date(d).toLocaleDateString() },
-                                { title: 'Instructor', dataIndex: ['instructorId', 'name'] },
-                                { title: 'Amount', dataIndex: 'amount', render: (a) => `$${a}` },
-                                { title: 'Ref', dataIndex: 'transactionRef' },
-                                { title: 'Status', dataIndex: 'status', render: (s) => <Tag color="green">{s.toUpperCase()}</Tag> }
+                                { title: <span style={{ color: '#8892b0' }}>Date</span>, dataIndex: 'payoutDate', render: (d) => <span style={{ color: '#ccd6f6' }}>{new Date(d).toLocaleDateString()}</span> },
+                                { title: <span style={{ color: '#8892b0' }}>Instructor</span>, dataIndex: ['instructorId', 'name'], render: (t) => <span style={{ color: '#ccd6f6' }}>{t}</span> },
+                                { title: <span style={{ color: '#8892b0' }}>Amount</span>, dataIndex: 'amount', render: (a) => <span style={{ color: '#00d1b2' }}>${a}</span> },
+                                { title: <span style={{ color: '#8892b0' }}>Ref</span>, dataIndex: 'transactionRef', render: (r) => <span style={{ color: '#8892b0' }}>{r}</span> },
+                                { title: <span style={{ color: '#8892b0' }}>Status</span>, dataIndex: 'status', render: (s) => <Tag color="cyan">{s.toUpperCase()}</Tag> }
                             ]}
                         />
                     </Card>
                 </TabPane>
-                <TabPane tab="Reviews Moderation" key="6">
-                    <Card title="Global Review Feed" style={{ borderRadius: 16 }}>
-                        <Table
-                            dataSource={reviews}
-                            columns={[
-                                { title: 'User', dataIndex: ['userId', 'name'] },
-                                { title: 'Course', dataIndex: ['courseId', 'title'] },
-                                { title: 'Rating', dataIndex: 'rating', render: (r) => <Tag color="gold">{r} ★</Tag> },
-                                { title: 'Comment', dataIndex: 'comment', ellipsis: true },
-                                {
-                                    title: 'Actions',
-                                    key: 'actions',
-                                    render: (_, record) => (
-                                        <Popconfirm title="Delete this review?" onConfirm={async () => {
-                                            await api.delete(`/admin/review/${record._id}`);
-                                            message.success('Review removed');
-                                            fetchData();
-                                        }}>
-                                            <Button danger icon={<DeleteOutlined />} type="text" />
-                                        </Popconfirm>
-                                    )
-                                }
-                            ]}
-                            rowKey="_id"
-                        />
-                    </Card>
-                </TabPane>
-                <TabPane tab="Categories" key="7">
-                    <Card
-                        title="Course Categories"
-                        extra={<Button type="primary" onClick={() => { categoryForm.resetFields(); setIsCategoryModalOpen(true); }}>Add Category</Button>}
-                        style={{ borderRadius: 16 }}
-                    >
-                        <Table
-                            dataSource={categories}
-                            columns={[
-                                { title: 'Name', dataIndex: 'name' },
-                                { title: 'Description', dataIndex: 'description' },
-                                {
-                                    title: 'Actions',
-                                    key: 'actions',
-                                    render: (_, record) => (
-                                        <Button danger icon={<DeleteOutlined />} onClick={async () => {
-                                            await api.delete(`/admin/categories/${record._id}`);
-                                            message.success('Category deleted');
-                                            fetchData();
-                                        }} />
-                                    )
-                                }
-                            ]}
-                            rowKey="_id"
-                        />
-                    </Card>
-                </TabPane>
-                <TabPane tab="User Management" key="8">
-                    <Card title="All Platform Users" style={{ borderRadius: 16 }}>
+                <TabPane tab={<span style={{ color: activeTab === '8' ? '#00d1b2' : '#8892b0' }}>User Management</span>} key="8">
+                    <Card title={<span style={{ color: '#ccd6f6' }}>All Platform Users</span>} className="glass-card" style={{ background: 'rgba(17, 34, 64, 0.7)' }}>
                         <Table
                             dataSource={users}
                             columns={[
-                                ...userColumns,
+                                ...userColumns.map(col => ({
+                                    ...col,
+                                    title: <span style={{ color: '#8892b0' }}>{col.title}</span>,
+                                    render: col.render || ((t) => <span style={{ color: '#ccd6f6' }}>{t}</span>)
+                                })),
                                 {
-                                    title: 'Actions',
+                                    title: <span style={{ color: '#8892b0' }}>Actions</span>,
                                     key: 'actions',
                                     render: (_, record) => (
                                         <Space>
                                             <Button
-                                                icon={<EditOutlined />}
+                                                icon={<EditOutlined style={{ color: '#00d1b2' }} />}
+                                                style={{ background: 'transparent', border: '1px solid rgba(0, 209, 178, 0.3)' }}
                                                 onClick={() => {
                                                     setEditingUser(record);
                                                     userForm.setFieldsValue(record);
@@ -455,8 +412,8 @@ const AdminDashboard = () => {
                         />
                     </Card>
                 </TabPane>
-                <TabPane tab="System Settings" key="9">
-                    <Card title="Global Configuration" style={{ borderRadius: 16 }}>
+                <TabPane tab={<span style={{ color: activeTab === '9' ? '#00d1b2' : '#8892b0' }}>System Settings</span>} key="9">
+                    <Card title={<span style={{ color: '#ccd6f6' }}>Global Configuration</span>} className="glass-card" style={{ background: 'rgba(17, 34, 64, 0.7)' }}>
                         <Form
                             layout="vertical"
                             initialValues={{
@@ -469,48 +426,35 @@ const AdminDashboard = () => {
                                 fetchData();
                             }}
                         >
-                            <Form.Item name="commission" label="Platform Commission (%)" help="Share of revenue taken by the platform.">
-                                <Input type="number" suffix="%" />
+                            <Form.Item name="commission" label={<span style={{ color: '#8892b0' }}>Platform Commission (%)</span>} help={<span style={{ color: '#555' }}>Share of revenue taken by the platform.</span>}>
+                                <Input type="number" suffix="%" style={{ background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(0, 209, 178, 0.2)', color: '#fff' }} />
                             </Form.Item>
-                            <Form.Item name="stripe_key" label="Stripe Private Key" help="Read-only for security here. Update in .env">
-                                <Input.Password disabled />
+                            <Form.Item name="stripe_key" label={<span style={{ color: '#8892b0' }}>Stripe Private Key</span>} help={<span style={{ color: '#555' }}>Read-only for security here. Update in .env</span>}>
+                                <Input.Password disabled style={{ background: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(0, 209, 178, 0.05)', color: '#8892b0' }} />
                             </Form.Item>
-                            <Button type="primary" htmlType="submit">Save Changes</Button>
+                            <Button type="primary" htmlType="submit" style={{ background: '#00d1b2', border: 'none', color: '#0a192f', fontWeight: 600 }}>Save Changes</Button>
                         </Form>
                     </Card>
                 </TabPane>
             </Tabs>
 
-            {/* Category Modal */}
-            <Modal title="Add Category" open={isCategoryModalOpen} onCancel={() => setIsCategoryModalOpen(false)} onOk={() => categoryForm.submit()}>
-                <Form form={categoryForm} onFinish={async (values) => {
-                    await api.post('/admin/categories', values);
-                    message.success('Category created');
-                    setIsCategoryModalOpen(false);
-                    fetchData();
-                }} layout="vertical">
-                    <Form.Item name="name" label="Category Name" rules={[{ required: true }]}><Input /></Form.Item>
-                    <Form.Item name="description" label="Description"><Input.TextArea /></Form.Item>
-                </Form>
-            </Modal>
-
             {/* Payout Modal */}
             <Modal
-                title={`Payout for ${selectedInstructor?.name}`}
+                title={<span style={{ color: '#112240' }}>Payout for ${selectedInstructor?.name}</span>}
                 open={isPayoutModalOpen}
                 onCancel={() => setIsPayoutModalOpen(false)}
                 footer={null}
             >
                 <div style={{ textAlign: 'center', marginBottom: 24 }}>
-                    <Card style={{ background: '#f8f9fa' }}>
+                    <Card style={{ background: 'rgba(10, 25, 47, 0.05)', border: '1px solid rgba(0, 209, 178, 0.1)' }}>
                         <Text type="secondary">Scan to pay via UPI</Text><br />
                         <img
                             src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=${selectedInstructor?.upiId}&pn=${selectedInstructor?.name}&am=${selectedInstructor?.payableAmount}`}
                             alt="UPI QR"
-                            style={{ margin: '20px auto', display: 'block' }}
+                            style={{ margin: '20px auto', display: 'block', border: '3px solid #00d1b2', borderRadius: 8 }}
                         />
-                        <Title level={4}>Amount: ${selectedInstructor?.payableAmount}</Title>
-                        <Text code>{selectedInstructor?.upiId}</Text>
+                        <Title level={4} style={{ color: '#112240' }}>Amount: ${selectedInstructor?.payableAmount}</Title>
+                        <Text code style={{ background: 'rgba(0, 209, 178, 0.05)' }}>{selectedInstructor?.upiId}</Text>
                     </Card>
                 </div>
                 <Form form={payoutForm} layout="vertical" onFinish={async (values) => {
@@ -524,7 +468,7 @@ const AdminDashboard = () => {
                     <Form.Item name="transactionRef" label="Transaction Reference (Internal ID)" rules={[{ required: true }]}>
                         <Input placeholder="Enter ref from your payment app" />
                     </Form.Item>
-                    <Button type="primary" block htmlType="submit">Confirm Payout Processed</Button>
+                    <Button type="primary" block htmlType="submit" style={{ background: '#00d1b2', border: 'none', color: '#0a192f', fontWeight: 600 }}>Confirm Payout Processed</Button>
                 </Form>
             </Modal>
 

@@ -24,7 +24,7 @@ const MainLayout = ({ children, onLogout }) => {
     const role = sessionStorage.getItem('role');
 
     const {
-        token: { colorBgContainer, borderRadiusLG },
+        token: { colorBgContainer, borderRadiusLG, colorPrimary, colorBgBase },
     } = theme.useToken();
 
     const handleLogout = () => {
@@ -62,12 +62,16 @@ const MainLayout = ({ children, onLogout }) => {
     };
 
     return (
-        <Layout style={{ minHeight: '100vh' }}>
+        <Layout style={{ minHeight: '100vh', background: colorBgBase }}>
             <Sider
                 trigger={null}
                 collapsible
                 collapsed={collapsed}
-                style={{ background: '#1d3557' }}
+                style={{
+                    background: 'rgba(10, 25, 47, 0.8)',
+                    backdropFilter: 'blur(10px)',
+                    borderRight: `1px solid rgba(0, 209, 178, 0.1)`
+                }}
             >
                 <div style={{
                     height: 64,
@@ -75,9 +79,10 @@ const MainLayout = ({ children, onLogout }) => {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: '#f1faee',
+                    color: colorPrimary,
                     fontWeight: 900,
                     fontSize: collapsed ? 12 : 20,
+                    textShadow: `0 0 10px ${colorPrimary}44`,
                     transition: 'all 0.3s'
                 }}>
                     {collapsed ? 'LMS' : 'ECOSYSTEM'}
@@ -88,28 +93,30 @@ const MainLayout = ({ children, onLogout }) => {
                     selectedKeys={[location.pathname]}
                     items={getMenuItems()}
                     onClick={({ key }) => navigate(key)}
-                    style={{ background: '#1d3557', border: 'none' }}
+                    style={{ background: 'transparent', border: 'none' }}
                 />
             </Sider>
-            <Layout>
+            <Layout style={{ background: colorBgBase }}>
                 <Header style={{
                     padding: '0 24px',
-                    background: colorBgContainer,
+                    background: 'rgba(17, 34, 64, 0.7)',
+                    backdropFilter: 'blur(15px)',
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+                    borderBottom: `1px solid rgba(0, 209, 178, 0.1)`,
+                    boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)'
                 }}>
                     <Button
                         type="text"
                         icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
                         onClick={() => setCollapsed(!collapsed)}
-                        style={{ fontSize: 16, width: 40, height: 40 }}
+                        style={{ fontSize: 16, width: 40, height: 40, color: colorPrimary }}
                     />
                     <Space size="large">
                         <Space>
-                            <Avatar icon={<UserOutlined />} style={{ backgroundColor: '#1d3557' }} />
-                            <Text strong style={{ color: '#1d3557' }}>{role?.toUpperCase()}</Text>
+                            <Avatar icon={<UserOutlined />} style={{ backgroundColor: colorPrimary }} />
+                            <Text strong style={{ color: '#e6f1ff' }}>{role?.toUpperCase()}</Text>
                         </Space>
                         <Button
                             type="primary"
@@ -117,7 +124,7 @@ const MainLayout = ({ children, onLogout }) => {
                             ghost
                             icon={<LogoutOutlined />}
                             onClick={handleLogout}
-                            style={{ borderRadius: 6 }}
+                            style={{ borderRadius: 6, borderColor: '#ff4d4f' }}
                         >
                             Sign Out
                         </Button>
@@ -128,9 +135,11 @@ const MainLayout = ({ children, onLogout }) => {
                         margin: '24px',
                         padding: 24,
                         minHeight: 280,
-                        background: colorBgContainer,
+                        background: 'rgba(17, 34, 64, 0.4)',
+                        backdropFilter: 'blur(10px)',
                         borderRadius: borderRadiusLG,
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+                        border: `1px solid rgba(0, 209, 178, 0.1)`,
+                        boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37)'
                     }}
                 >
                     {children}

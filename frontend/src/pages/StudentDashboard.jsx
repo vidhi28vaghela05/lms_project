@@ -118,44 +118,44 @@ const StudentDashboard = () => {
     ];
 
     return (
-        <div style={{ padding: '0 20px' }}>
+        <div style={{ padding: '0 20px', background: 'transparent' }} className="fade-in">
             <div style={{ marginBottom: 32 }}>
-                <Title level={2} style={{ color: '#1d3557', margin: 0 }}>Learning Vector Core</Title>
-                <Text type="secondary">Monitor your cognitive progression and mission status.</Text>
+                <Title level={2} className="glow-text" style={{ margin: 0 }}>Learning Vector Core</Title>
+                <Text style={{ color: '#8892b0' }}>Synchronizing your educational progression and active modules.</Text>
             </div>
 
             <Row gutter={[24, 24]} style={{ marginBottom: 32 }}>
                 <Col xs={24} sm={8}>
-                    <Card className="glass-card">
+                    <Card className="glass-card" style={{ border: '1px solid rgba(0, 209, 178, 0.1)' }}>
                         <Space direction="vertical" style={{ width: '100%', textAlign: 'center' }}>
-                            <RiseOutlined style={{ fontSize: 32, color: '#457b9d' }} />
-                            <Title level={4} style={{ margin: 0 }}>{stats.inProgress}</Title>
-                            <Text type="secondary">Active Missions</Text>
+                            <RiseOutlined style={{ fontSize: 32, color: '#00d1b2' }} />
+                            <Title level={4} style={{ margin: 0, color: '#fff' }}>{stats.inProgress}</Title>
+                            <Text style={{ color: '#8892b0' }}>Active Modules</Text>
                         </Space>
                     </Card>
                 </Col>
                 <Col xs={24} sm={8}>
-                    <Card className="glass-card">
+                    <Card className="glass-card" style={{ border: '1px solid rgba(0, 209, 178, 0.1)' }}>
                         <Space direction="vertical" style={{ width: '100%', textAlign: 'center' }}>
-                            <CheckCircleOutlined style={{ fontSize: 32, color: '#52c41a' }} />
-                            <Title level={4} style={{ margin: 0 }}>{stats.completed}</Title>
-                            <Text type="secondary">Completed Protocols</Text>
+                            <CheckCircleOutlined style={{ fontSize: 32, color: '#00d1b2' }} />
+                            <Title level={4} style={{ margin: 0, color: '#fff' }}>{stats.completed}</Title>
+                            <Text style={{ color: '#8892b0' }}>Acquisitions Completed</Text>
                         </Space>
                     </Card>
                 </Col>
                 <Col xs={24} sm={8}>
-                    <Card className="glass-card">
+                    <Card className="glass-card" style={{ border: '1px solid rgba(0, 209, 178, 0.1)' }}>
                         <Space direction="vertical" style={{ width: '100%', textAlign: 'center' }}>
-                            <TrophyOutlined style={{ fontSize: 32, color: '#fadb14' }} />
-                            <Title level={4} style={{ margin: 0 }}>{stats.avgScore}%</Title>
-                            <Text type="secondary">Average Precision</Text>
+                            <TrophyOutlined style={{ fontSize: 32, color: '#00d1b2' }} />
+                            <Title level={4} style={{ margin: 0, color: '#fff' }}>{stats.avgScore}%</Title>
+                            <Text style={{ color: '#8892b0' }}>Sync Accuracy</Text>
                         </Space>
                     </Card>
                 </Col>
             </Row>
 
             <Tabs defaultActiveKey="1" style={{ marginTop: 24 }}>
-                <TabPane tab="My Enlistments" key="1">
+                <TabPane tab="My Courses" key="1">
                     <Row gutter={[24, 24]}>
                         {courses.length > 0 ? (
                             courses.map((enrollment) => (
@@ -163,29 +163,30 @@ const StudentDashboard = () => {
                                     <Card
                                         hoverable
                                         className="glass-card"
+                                        style={{ border: '1px solid rgba(0, 209, 178, 0.1)' }}
                                         cover={
-                                            <div style={{ height: 140, background: 'linear-gradient(135deg, #1d3557, #457b9d)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            <div style={{ height: 140, background: 'rgba(17, 34, 64, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                                 {enrollment.courseId?.thumbnail ? (
-                                                    <img src={enrollment.courseId.thumbnail} alt={enrollment.courseId.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                    <img src={enrollment.courseId.thumbnail} alt={enrollment.courseId.title} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.7 }} />
                                                 ) : (
-                                                    <BookOutlined style={{ fontSize: 40, color: '#fff' }} />
+                                                    <BookOutlined style={{ fontSize: 40, color: '#00d1b2', opacity: 0.3 }} />
                                                 )}
                                             </div>
                                         }
                                         actions={[
-                                            <Button type="link" onClick={() => navigate(`/lessons/${enrollment.courseId?._id}`)}>Resume</Button>,
+                                            <Button type="link" style={{ color: '#00d1b2' }} onClick={() => navigate(`/lessons/${enrollment.courseId?._id}`)}>Resume Session</Button>,
                                             enrollment.progressPercentage >= 100 && (
-                                                <Button type="link" onClick={() => navigate(`/certificate/${enrollment.courseId?._id}`)}>Certificate</Button>
+                                                <Button type="link" style={{ color: '#00d1b2' }} onClick={() => navigate(`/certificate/${enrollment.courseId?._id}`)}>Blueprint</Button>
                                             )
                                         ]}
                                     >
                                         <Card.Meta
-                                            title={enrollment.courseId?.title}
+                                            title={<span style={{ fontWeight: 600, color: '#fff' }}>{enrollment.courseId?.title}</span>}
                                             description={
                                                 <div>
-                                                    <Progress percent={enrollment.progressPercentage || 0} size="small" />
-                                                    <Tag color={enrollment.progressPercentage >= 100 ? 'green' : 'blue'} style={{ marginTop: 8 }}>
-                                                        {enrollment.progressPercentage >= 100 ? 'COMPLETED' : 'IN PROGRESS'}
+                                                    <Progress percent={enrollment.progressPercentage || 0} size="small" strokeColor="#00d1b2" trailColor="rgba(255,255,255,0.05)" />
+                                                    <Tag color="cyan" style={{ marginTop: 8, background: 'rgba(0, 209, 178, 0.1)', border: '1px solid rgba(0, 209, 178, 0.2)' }}>
+                                                        {enrollment.progressPercentage >= 100 ? 'SUCCESS' : 'SYNCING'}
                                                     </Tag>
                                                 </div>
                                             }
@@ -195,38 +196,39 @@ const StudentDashboard = () => {
                             ))
                         ) : (
                             <Col span={24}>
-                                <Card style={{ textAlign: 'center', padding: '40px 0' }}>
-                                    <Text type="secondary">No active missions found. Teleport to the repository to begin.</Text><br />
-                                    <Button type="primary" style={{ marginTop: 16 }} onClick={() => navigate('/courses')}>Browse Repository</Button>
+                                <Card className="glass-card" style={{ textAlign: 'center', padding: '40px 0' }}>
+                                    <Text style={{ color: '#8892b0' }}>No active neural links found. Explore the library to begin synchronization.</Text><br />
+                                    <Button type="primary" style={{ marginTop: 16 }} onClick={() => navigate('/courses')}>Browse Modules</Button>
                                 </Card>
                             </Col>
                         )}
                     </Row>
                 </TabPane>
-                <TabPane tab="Recommended for You" key="3">
+                <TabPane tab="Recommended" key="3">
                     <Row gutter={[24, 24]}>
                         {recommendations.map((course) => (
                             <Col xs={24} md={8} key={course._id}>
                                 <Card
                                     hoverable
                                     className="glass-card"
+                                    style={{ border: '1px solid rgba(0, 209, 178, 0.1)' }}
                                     cover={
-                                        <div style={{ height: 140, background: 'linear-gradient(135deg, #e63946, #1d3557)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <div style={{ height: 140, background: 'rgba(17, 34, 64, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                             {course.thumbnail ? (
-                                                <img src={course.thumbnail} alt={course.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                <img src={course.thumbnail} alt={course.title} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.6 }} />
                                             ) : (
-                                                <BookOutlined style={{ fontSize: 40, color: '#fff' }} />
+                                                <BookOutlined style={{ fontSize: 40, color: '#00d1b2', opacity: 0.4 }} />
                                             )}
                                         </div>
                                     }
                                     onClick={() => navigate(`/courses`)}
                                 >
                                     <Card.Meta
-                                        title={course.title}
+                                        title={<span style={{ fontWeight: 600, color: '#fff' }}>{course.title}</span>}
                                         description={
                                             <div>
-                                                <Text type="secondary">{course.level.toUpperCase()}</Text><br />
-                                                <Text strong color="#e63946">${course.price || 0}</Text>
+                                                <Text style={{ color: '#8892b0' }}>{course.level.toUpperCase()}</Text><br />
+                                                <Text strong style={{ color: '#00d1b2' }}>${course.price || 0}</Text>
                                             </div>
                                         }
                                     />
@@ -235,16 +237,17 @@ const StudentDashboard = () => {
                         ))}
                     </Row>
                 </TabPane>
-                <TabPane tab="Vanguard Wishlist" key="2">
-                    <Card className="glass-card">
+                <TabPane tab="Wishlist" key="2">
+                    <Card className="glass-card" style={{ border: '1px solid rgba(0, 209, 178, 0.1)' }}>
                         <Table
+                            className="custom-dark-table"
                             dataSource={wishlist}
                             columns={[
-                                { title: 'Course', dataIndex: 'title' },
-                                { title: 'Level', dataIndex: 'level' },
+                                { title: 'Module', dataIndex: 'title', render: (t) => <span style={{ fontWeight: 600, color: '#fff' }}>{t}</span> },
+                                { title: 'Level', dataIndex: 'level', render: (l) => <Tag color="cyan" style={{ background: 'rgba(0, 209, 178, 0.1)', border: '1px solid rgba(0, 209, 178, 0.2)' }}>{l.toUpperCase()}</Tag> },
                                 {
-                                    title: 'Action',
-                                    render: (_, record) => <Button onClick={() => navigate('/courses')}>View Details</Button>
+                                    title: 'Status',
+                                    render: (_, record) => <Button type="link" style={{ color: '#00d1b2' }} onClick={() => navigate('/courses')}>Begin Sync</Button>
                                 }
                             ]}
                             rowKey="_id"

@@ -50,8 +50,8 @@ const Navbar = () => {
     ];
 
     const isHomePage = location.pathname === '/';
-    const navbarBg = '#1d3557';
-    const logoColor = '#fff';
+    const navbarBg = scrolled ? 'rgba(10, 25, 47, 0.85)' : 'transparent';
+    const logoColor = '#00d1b2';
 
     return (
         <Header
@@ -63,11 +63,12 @@ const Navbar = () => {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 background: navbarBg,
-                backdropFilter: 'blur(10px)',
-                transition: 'all 0.3s ease',
+                backdropFilter: 'blur(15px)',
+                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                 padding: '0 50px',
-                height: scrolled ? '64px' : '80px',
-                borderBottom: '1px solid rgba(255,255,255,0.1)'
+                height: scrolled ? '70px' : '90px',
+                borderBottom: scrolled ? '1px solid rgba(0, 209, 178, 0.1)' : 'none',
+                boxShadow: scrolled ? '0 10px 30px -10px rgba(2, 12, 27, 0.7)' : 'none'
             }}
         >
             <div
@@ -87,7 +88,7 @@ const Navbar = () => {
                         letterSpacing: '-1px'
                     }}
                 >
-                    LMS<span style={{ color: '#e63946' }}>3.0</span>
+                    LMS<span style={{ color: '#00d1b2', textShadow: '0 0 10px rgba(0, 209, 178, 0.3)' }}>3.0</span>
                 </Title>
             </div>
 
@@ -101,19 +102,21 @@ const Navbar = () => {
                     border: 'none',
                     minWidth: '400px',
                     justifyContent: 'center',
-                    color: '#fff',
+                    color: '#8892b0',
                     flex: 1
                 }}
                 theme="dark"
             />
 
-            <Space size="middle">
+            <Space size="large">
                 {user ? (
                     /* Logged In: Show User Avatar */
-                    <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
+                    <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" arrow>
                         <Avatar
                             style={{
-                                backgroundColor: '#e63946',
+                                backgroundColor: 'rgba(0, 209, 178, 0.1)',
+                                border: '1px solid #00d1b2',
+                                color: '#00d1b2',
                                 cursor: 'pointer',
                                 fontWeight: 700
                             }}
@@ -126,7 +129,7 @@ const Navbar = () => {
                     <>
                         <Button
                             type="text"
-                            style={{ color: '#fff', fontWeight: 600 }}
+                            style={{ color: '#ccd6f6', fontWeight: 600 }}
                             onClick={() => navigate('/login')}
                         >
                             Log In
@@ -134,11 +137,14 @@ const Navbar = () => {
                         <Button
                             type="primary"
                             style={{
-                                background: '#e63946',
+                                background: '#00d1b2',
                                 border: 'none',
-                                height: '40px',
-                                padding: '0 25px',
-                                fontWeight: 700
+                                height: '45px',
+                                padding: '0 30px',
+                                borderRadius: '8px',
+                                color: '#0a192f',
+                                fontWeight: 700,
+                                boxShadow: '0 4px 14px 0 rgba(0, 209, 178, 0.3)'
                             }}
                             onClick={() => navigate('/register')}
                         >
@@ -150,15 +156,23 @@ const Navbar = () => {
 
             <style>{`
                 .ant-menu-dark .ant-menu-item {
-                    color: rgba(255,255,255,0.85) !important;
+                    color: #8892b0 !important;
                     font-weight: 500;
+                    transition: all 0.3s ease;
+                }
+                .ant-menu-dark .ant-menu-item:hover {
+                    color: #00d1b2 !important;
                 }
                 .ant-menu-dark .ant-menu-item-selected {
-                    color: #e63946 !important;
+                    color: #00d1b2 !important;
                     background: transparent !important;
                 }
+                .ant-menu-dark.ant-menu-horizontal > .ant-menu-item-selected::after {
+                    border-bottom-color: #00d1b2 !important;
+                    border-bottom-width: 2px !important;
+                }
                 .ant-menu-dark.ant-menu-horizontal > .ant-menu-item:hover::after {
-                    border-bottom-color: #e63946 !important;
+                    border-bottom-color: #00d1b2 !important;
                 }
             `}</style>
         </Header>

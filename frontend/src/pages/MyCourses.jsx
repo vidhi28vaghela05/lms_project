@@ -28,32 +28,34 @@ const MyCourses = () => {
     if (loading) return <div style={{ textAlign: 'center', padding: 50 }}><Spin size="large" /></div>;
 
     return (
-        <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-            <div style={{ marginBottom: 32 }}>
-                <Title level={2} style={{ color: '#1d3557' }}>
-                    <BookOutlined style={{ marginRight: 12 }} />
-                    My Enrolled Courses
+        <div style={{ maxWidth: 1000, margin: '0 auto', background: 'transparent' }} className="fade-in">
+            <div style={{ marginBottom: 40, textAlign: 'center' }}>
+                <Title level={1} className="glow-text" style={{ marginBottom: 8 }}>
+                    <BookOutlined style={{ marginRight: 16 }} />
+                    Neural Repository
                 </Title>
-                <Text type="secondary">Continue where you left off and complete your learning goals.</Text>
+                <Text style={{ color: '#8892b0', fontSize: '18px' }}>Access your enrolled neural modules and active learning synchronizations.</Text>
             </div>
 
             {enrollments.length > 0 ? (
                 <List
-                    grid={{ gutter: 24, xs: 1, sm: 2, md: 2, lg: 3 }}
+                    grid={{ gutter: 32, xs: 1, sm: 2, md: 2, lg: 3 }}
                     dataSource={enrollments}
                     renderItem={(item) => (
                         <List.Item>
                             <Card
+                                className="glass-card"
                                 hoverable
                                 cover={
                                     <div style={{
                                         height: 160,
-                                        background: 'linear-gradient(135deg, #457b9d 0%, #1d3557 100%)',
+                                        background: 'rgba(17, 34, 64, 0.5)',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        color: '#fff',
-                                        fontSize: 40
+                                        color: '#00d1b2',
+                                        fontSize: 48,
+                                        borderBottom: '1px solid rgba(0, 209, 178, 0.1)'
                                     }}>
                                         <BookOutlined />
                                     </div>
@@ -64,24 +66,36 @@ const MyCourses = () => {
                                         icon={<PlayCircleOutlined />}
                                         block
                                         onClick={() => navigate(`/lessons/${item.courseId?._id}`)}
-                                        style={{ background: '#1d3557', border: 'none' }}
+                                        style={{
+                                            height: '45px',
+                                            borderRadius: '0 0 12px 12px',
+                                            background: '#00d1b2',
+                                            border: 'none',
+                                            color: '#0a192f'
+                                        }}
                                     >
-                                        Resume Learning
+                                        Resume Session
                                     </Button>
                                 ]}
-                                style={{ borderRadius: 12, overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}
+                                style={{
+                                    border: '1px solid rgba(0, 209, 178, 0.1)',
+                                    borderRadius: 16,
+                                    overflow: 'hidden',
+                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                                }}
                             >
                                 <Card.Meta
-                                    title={<Text strong style={{ fontSize: 18 }}>{item.courseId?.title}</Text>}
+                                    title={<Text style={{ fontSize: 20, color: '#fff', fontWeight: 600 }}>{item.courseId?.title}</Text>}
                                     description={
-                                        <div style={{ marginTop: 12 }}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                                                <Text type="secondary">Progress</Text>
-                                                <Text strong>{item.progressPercentage}%</Text>
+                                        <div style={{ marginTop: 16 }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
+                                                <Text style={{ color: '#8892b0' }}>Sync Progress</Text>
+                                                <Text style={{ color: '#00d1b2', fontWeight: 600 }}>{item.progressPercentage}%</Text>
                                             </div>
                                             <Progress
                                                 percent={item.progressPercentage}
-                                                strokeColor={{ '0%': '#457b9d', '100%': '#1d3557' }}
+                                                strokeColor="#00d1b2"
+                                                trailColor="rgba(255,255,255,0.05)"
                                                 status="active"
                                             />
                                         </div>
@@ -92,13 +106,34 @@ const MyCourses = () => {
                     )}
                 />
             ) : (
-                <Card style={{ borderRadius: 16, textAlign: 'center', padding: '40px 0' }}>
+                <Card
+                    className="glass-card"
+                    style={{
+                        borderRadius: 16,
+                        textAlign: 'center',
+                        padding: '60px 0',
+                        border: '1px solid rgba(0, 209, 178, 0.1)'
+                    }}
+                >
                     <Empty
                         image={Empty.PRESENTED_IMAGE_SIMPLE}
-                        description="You haven't enrolled in any courses yet."
+                        description={<span style={{ color: '#8892b0', fontSize: '16px' }}>No neural links detected.</span>}
                     >
-                        <Button type="primary" size="large" onClick={() => navigate('/dashboard')}>
-                            Explore Courses
+                        <Button
+                            type="primary"
+                            size="large"
+                            onClick={() => navigate('/dashboard')}
+                            style={{
+                                height: '50px',
+                                padding: '0 32px',
+                                borderRadius: '12px',
+                                marginTop: '24px',
+                                background: '#00d1b2',
+                                border: 'none',
+                                color: '#0a192f'
+                            }}
+                        >
+                            Explore Modules
                         </Button>
                     </Empty>
                 </Card>
