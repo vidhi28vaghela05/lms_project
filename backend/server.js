@@ -10,6 +10,8 @@ process.on('unhandledRejection', (reason, promise) => {
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
+const path = require('path');
+const cors = require('cors');
 
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');

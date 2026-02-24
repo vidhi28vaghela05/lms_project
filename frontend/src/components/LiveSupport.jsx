@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, Card, Input, List, Avatar, Space, Typography, Badge } from 'antd';
-import { MessageOutlined, CloseOutlined, SendOutlined, UserOutlined } from '@ant-design/icons';
+import { Button, Card, Input, List, Space, Typography, Badge } from 'antd';
+import { MessageOutlined, CloseOutlined, SendOutlined } from '@ant-design/icons';
 import { io } from 'socket.io-client';
 import { useAuth } from '../context/AuthContext';
+import api from '../services/api';
 
 const { Text } = Typography;
 const socket = io(window.location.origin); // Using current origin for single-port setup
@@ -13,34 +14,89 @@ const LiveSupport = () => {
     const [message, setMessage] = useState('');
     const [chat, setChat] = useState([]);
     const [unread, setUnread] = useState(0);
+    const [conversationId, setConversationId] = useState(null);
     const scrollRef = useRef();
+    const isOpenRef = useRef(false);
 
     useEffect(() => {
-        if (user && user._id) {
-            socket.emit('register', user._id);
-            const handleMessage = (msg) => {
-                setChat(prev => [...prev, msg]);
-                if (!isOpen) setUnread(u => u + 1);
-            };
-            socket.on('receiveMessage', handleMessage);
-            return () => socket.off('receiveMessage', handleMessage);
-        }
-    }, [user, isOpen]);
+        isOpenRef.current = isOpen;
+    }, [isOpen]);
+
+    useEffect(() => {
+        if (!user || !user._id) return;
+
+        let mounted = true;
+
+        const initSupportConversation = async () => {
+            try {
+                socket.emit('register', user._id);
+
+                // Find an admin to act as Collective Support
+                const { data: partners } = await api.get('/chat/partners');
+                const adminPartner = partners.find(p => p.role === 'admin' && p._id !== user._id) || partners[0];
+                if (!adminPartner) {
+                    console.warn('No support partner available for Collective Support');
+                    return;
+                }
+
+                const { data: conversation } = await api.post('/chat/conversation', {
+                    participantId: adminPartner._id,
+                });
+
+                if (!mounted) return;
+
+                setConversationId(conversation._id);
+
+                // Join the conversation room and load history
+                socket.emit('joinConversation', conversation._id);
+                socket.emit('markAsRead', { conversationId: conversation._id, userId: user._id });
+
+                const { data: messages } = await api.get(`/chat/messages/${conversation._id}`);
+                if (!mounted) return;
+                setChat(messages);
+
+                const handleMessage = (msg) => {
+                    if (msg.conversationId !== conversation._id) return;
+                    setChat(prev => [...prev, msg]);
+                    if (!isOpenRef.current) {
+                        setUnread(u => u + 1);
+                    } else {
+                        socket.emit('markAsRead', { conversationId: conversation._id, userId: user._id });
+                    }
+                };
+
+                socket.on('receiveMessage', handleMessage);
+
+                return () => {
+                    socket.off('receiveMessage', handleMessage);
+                };
+            } catch (error) {
+                console.error('Failed to initialize Collective Support:', error);
+            }
+        };
+
+        const cleanupPromise = initSupportConversation();
+
+        return () => {
+            mounted = false;
+        };
+    }, [user]);
 
     useEffect(() => {
         scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [chat]);
 
     const sendMessage = () => {
-        if (!message.trim() || !user?._id) return;
+        if (!message.trim() || !user?._id || !conversationId) return;
+
         const msgData = {
+            conversationId,
             senderId: user._id,
-            receiverId: 'admin_id_placeholder', // Still a placeholder, but backend now handles it safely
             text: message,
-            createdAt: new Date()
+            messageType: 'text',
         };
-        socket.emit('sendMessage', msgData); // Fixed: Backend now has try-catch safety
-        setChat(prev => [...prev, msgData]);
+
+        socket.emit('sendMessage', msgData);
         setMessage('');
     };
 
@@ -77,26 +133,30 @@ const LiveSupport = () => {
                     }}>
                         <List
                             dataSource={chat}
-                            renderItem={msg => (
-                                <div style={{ textAlign: msg.senderId === user._id ? 'right' : 'left', marginBottom: 12 }}>
-                                    <Space direction="vertical" size={0}>
-                                        <div style={{
-                                            background: msg.senderId === user._id ? 'rgba(0, 209, 178, 0.15)' : 'rgba(17, 34, 64, 0.8)',
-                                            color: '#fff',
-                                            padding: '8px 12px',
-                                            borderRadius: '12px 12px 0 12px',
-                                            border: `1px solid ${msg.senderId === user._id ? 'rgba(0, 209, 178, 0.3)' : 'rgba(255,255,255,0.05)'}`,
-                                            boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-                                            maxWidth: 250
-                                        }}>
-                                            {msg.text}
-                                        </div>
-                                        <Text style={{ fontSize: 10, color: '#8892b0', marginTop: 4, display: 'block' }}>
-                                            {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                        </Text>
-                                    </Space>
-                                </div>
-                            )}
+                            renderItem={msg => {
+                                const isMe = msg.sender === user._id || msg.sender?._id === user._id;
+                                const text = msg.message || msg.text || '';
+                                return (
+                                    <div style={{ textAlign: isMe ? 'right' : 'left', marginBottom: 12 }}>
+                                        <Space direction="vertical" size={0}>
+                                            <div style={{
+                                                background: isMe ? 'rgba(0, 209, 178, 0.15)' : 'rgba(17, 34, 64, 0.8)',
+                                                color: '#fff',
+                                                padding: '8px 12px',
+                                                borderRadius: isMe ? '12px 12px 0 12px' : '12px 12px 12px 0',
+                                                border: `1px solid ${isMe ? 'rgba(0, 209, 178, 0.3)' : 'rgba(255,255,255,0.05)'}`,
+                                                boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+                                                maxWidth: 250
+                                            }}>
+                                                {text}
+                                            </div>
+                                            <Text style={{ fontSize: 10, color: '#8892b0', marginTop: 4, display: 'block' }}>
+                                                {msg.createdAt && new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            </Text>
+                                        </Space>
+                                    </div>
+                                );
+                            }}
                         />
                         <div ref={scrollRef} />
                     </div>

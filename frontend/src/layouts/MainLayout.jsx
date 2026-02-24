@@ -14,6 +14,7 @@ import {
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import FloatingChatBubble from '../components/chat/FloatingChatBubble';
+import LiveSupport from '../components/LiveSupport';
 
 const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
@@ -150,6 +151,7 @@ const MainLayout = ({ children, onLogout }) => {
                 </Content>
             </Layout>
             <FloatingChatBubble />
+            <LiveSupport />
         </Layout>
     );
 };
