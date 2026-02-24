@@ -3,6 +3,7 @@ const Course = require('../models/Course');
 const Enrollment = require('../models/Enrollment');
 const Review = require('../models/Review');
 const Certificate = require('../models/Certificate');
+const Message = require('../models/Message');
 const crypto = require('crypto');
 const PDFDocument = require('pdfkit');
 const mongoose = require('mongoose');
@@ -201,6 +202,46 @@ exports.generateCertificate = async (req, res) => {
 
     doc.end();
 
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getMessages = async (req, res) => {
+  try {
+    const messages = await Message.find({
+      $or: [
+        { sender: req.user.id },
+        { receiver: req.user.id }
+      ]
+    }).sort({ createdAt: 1 }).populate('sender receiver', 'name role');
+    res.json(messages);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.sendMessage = async (req, res) => {
+  try {
+    const { message, receiverId, courseId } = req.body;
+    
+    // If receiverId is not provided, we might default to course instructor if courseId is present
+    let finalReceiverId = receiverId;
+    if (!finalReceiverId && courseId) {
+      const course = await Course.findById(courseId);
+      if (course) finalReceiverId = course.instructorId;
+    }
+
+    if (!finalReceiverId) return res.status(400).json({ message: 'Receiver identity required' });
+
+    const newMessage = await Message.create({
+      sender: req.user.id,
+      receiver: finalReceiverId,
+      message,
+      courseId
+    });
+
+    res.status(201).json(newMessage);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

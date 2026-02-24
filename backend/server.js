@@ -13,10 +13,11 @@ const { Server } = require('socket.io');
 
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const cors = require('cors');
-const path = require('path');
-
-dotenv.config({ path: path.join(__dirname, '.env') });
+// Try root .env first, fall back to backend/.env
+dotenv.config({ path: path.join(__dirname, '../.env') });
+if (!process.env.MONGO_URI) {
+  dotenv.config({ path: path.join(__dirname, '.env') });
+}
 
 const app = express();
 const server = http.createServer(app);
@@ -58,6 +59,7 @@ app.use('/api/instructor', require('./routes/instructor'));
 app.use('/api/student', require('./routes/student'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/payments', require('./routes/payments'));
+app.use('/api/chat', require('./routes/chat'));
 
 
 
@@ -93,43 +95,103 @@ app.use((err, req, res, next) => {
 
 // Socket.io Logic
 const Message = require('./models/Message');
+const Conversation = require('./models/Conversation');
+
+const onlineUsers = new Map(); // userId -> socketId
 
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
   socket.on('register', (userId) => {
+    socket.userId = userId;
+    onlineUsers.set(userId, socket.id);
     socket.join(userId);
-    console.log(`User ${userId} registered in socket room`);
+    console.log(`User ${userId} registered and online`);
+    
+    // Notify others that this user is online
+    io.emit('userStatus', { userId, status: 'online' });
+  });
+
+  socket.on('joinConversation', (conversationId) => {
+    socket.join(conversationId);
+    console.log(`User joined conversation room: ${conversationId}`);
   });
 
   socket.on('sendMessage', async (data) => {
     try {
-      const { senderId, receiverId, text } = data;
+      const { conversationId, senderId, text, messageType, fileUrl, fileName } = data;
       
-      // Basic validation to prevent crashes on placeholder IDs or missing data
-      if (!text || !senderId || !receiverId || receiverId === 'admin_id_placeholder') {
-        return;
-      }
-
       const newMessage = await Message.create({ 
+        conversationId,
         sender: senderId, 
-        receiver: receiverId, 
-        message: text 
+        message: text,
+        messageType: messageType || 'text',
+        fileUrl,
+        fileName,
+        status: 'sent'
       });
 
-      io.to(receiverId).emit('receiveMessage', {
-        senderId,
-        receiverId,
-        text,
-        createdAt: newMessage.createdAt
+      // Update conversation last message and unread counts
+      const conversation = await Conversation.findByIdAndUpdate(
+        conversationId,
+        { 
+          lastMessage: newMessage._id,
+          $inc: { 'unreadCounts.$[elem].count': 1 }
+        },
+        { 
+          arrayFilters: [{ 'elem.user': { $ne: senderId } }],
+          new: true 
+        }
+      );
+
+      // Emit to the conversation room
+      io.to(conversationId).emit('receiveMessage', newMessage);
+
+      // Also emit update to conversation list for all participants
+      conversation.participants.forEach(participantId => {
+        io.to(participantId.toString()).emit('conversationUpdate', conversation);
       });
+
     } catch (error) {
       console.error('Socket sendMessage error:', error.message);
     }
   });
 
+  socket.on('typing', (data) => {
+    const { conversationId, userId, userName } = data;
+    socket.to(conversationId).emit('userTyping', { conversationId, userId, userName });
+  });
+
+  socket.on('stopTyping', (data) => {
+    const { conversationId, userId } = data;
+    socket.to(conversationId).emit('userStoppedTyping', { conversationId, userId });
+  });
+
+  socket.on('markAsRead', async (data) => {
+    const { conversationId, userId } = data;
+    try {
+      await Message.updateMany(
+        { conversationId, sender: { $ne: userId }, 'readBy.user': { $ne: userId } },
+        { $push: { readBy: { user: userId } }, status: 'read' }
+      );
+      
+      await Conversation.updateOne(
+        { _id: conversationId, 'unreadCounts.user': userId },
+        { $set: { 'unreadCounts.$.count': 0 } }
+      );
+
+      io.to(conversationId).emit('messagesRead', { conversationId, userId });
+    } catch (err) {
+      console.error('Mark as read error:', err.message);
+    }
+  });
+
   socket.on('disconnect', () => {
-    console.log('User disconnected');
+    if (socket.userId) {
+      onlineUsers.delete(socket.userId);
+      io.emit('userStatus', { userId: socket.userId, status: 'offline' });
+      console.log(`User ${socket.userId} offline`);
+    }
   });
 });
 

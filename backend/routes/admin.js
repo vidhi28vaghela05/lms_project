@@ -6,6 +6,7 @@ const {
   approveCourse, 
   handleCourseUpdateRequest,
   confirmManualPayment,
+  getPendingPayments,
   getPayoutRecords,
   processPayout,
   deleteReview,
@@ -24,6 +25,7 @@ const router = express.Router();
 
 router.get('/users', protect, authorize('admin'), getAllUsers);
 router.get('/analytics', protect, authorize('admin'), getSystemAnalytics);
+router.get('/payments/pending', protect, authorize('admin'), getPendingPayments);
 router.post('/approve-instructor', protect, authorize('admin'), updateInstructorStatus);
 router.post('/approve-course/:courseId', protect, authorize('admin'), approveCourse);
 router.post('/course-update', protect, authorize('admin'), handleCourseUpdateRequest);

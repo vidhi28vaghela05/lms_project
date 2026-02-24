@@ -143,6 +143,18 @@ exports.confirmManualPayment = async (req, res) => {
   }
 };
 
+exports.getPendingPayments = async (req, res) => {
+  try {
+    const payments = await Payment.find({ status: 'pending', method: 'upi' })
+      .populate('userId', 'name email')
+      .populate('courseId', 'title')
+      .sort({ createdAt: -1 });
+    res.json(payments);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 exports.getPayoutRecords = async (req, res) => {
   try {
     const payouts = await Payout.find().populate('instructorId', 'name email upiId');
@@ -176,6 +188,15 @@ exports.processPayout = async (req, res) => {
 
     // Send email notification
     await sendPayoutConfirmation(instructor.email, amount, transactionRef);
+
+    // Add System Notification
+    const Message = require('../models/Message');
+    await Message.create({
+      sender: req.user.id,
+      receiver: instructorId,
+      message: `System Alert: A payout of $${amount} has been processed (Ref: ${transactionRef}).`,
+      isSystemNotification: true
+    });
 
     res.json({ message: 'Payout processed successfully' });
   } catch (error) {

@@ -39,7 +39,7 @@ const LiveSupport = () => {
             text: message,
             createdAt: new Date()
         };
-        // socket.emit('sendMessage', msgData); // Temporarily commented out until real admin ID exists to avoid backend log spam
+        socket.emit('sendMessage', msgData); // Fixed: Backend now has try-catch safety
         setChat(prev => [...prev, msgData]);
         setMessage('');
     };

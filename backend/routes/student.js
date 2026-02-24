@@ -21,5 +21,7 @@ router.post('/review', protect, authorize('student'), addReview);
 router.put('/review/:id', protect, authorize('student'), editReview);
 router.post('/progress', protect, authorize('student'), updateModuleProgress);
 router.get('/certificate/:courseId', protect, authorize('student'), generateCertificate);
+router.get('/messages', protect, authorize('student'), getMessages);
+router.post('/messages', protect, authorize('student'), sendMessage);
 
 module.exports = router;

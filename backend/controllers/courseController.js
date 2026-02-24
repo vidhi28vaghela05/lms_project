@@ -4,10 +4,11 @@ const mongoose = require('mongoose');
 
 exports.createCourse = async (req, res) => {
   try {
-    const { title, description, skillsCovered, level, thumbnail, status } = req.body;
+    const { title, description, price, skillsCovered, level, thumbnail, status } = req.body;
     const course = await Course.create({
       title,
       description,
+      price,
       instructorId: req.user.id,
       skillsCovered,
       level,
@@ -50,14 +51,24 @@ exports.getCourses = async (req, res) => {
       if (req.user.role === 'admin') {
         delete query.isApproved;
       } else if (req.user.role === 'instructor') {
-        query = {
-          ...query,
+        const instructorId = req.user.id;
+        const visibilityFilter = {
           $or: [
             { isApproved: true },
-            { instructorId: req.user.id }
+            { instructorId: instructorId }
           ]
         };
-        // Remove the default filter to allow the $or to work
+        
+        // If query already has an $or (from keyword), we need to AND them
+        if (query.$or) {
+          query.$and = [
+            { $or: query.$or },
+            visibilityFilter
+          ];
+          delete query.$or;
+        } else {
+          query = { ...query, ...visibilityFilter };
+        }
         delete query.isApproved;
       }
     }

@@ -7,10 +7,10 @@ const {
   deleteCourse,
   getPopularCourses
 } = require('../controllers/courseController');
-const { protect, authorize } = require('../middleware/authMiddleware');
+const { protect, authorize, optionalProtect } = require('../middleware/authMiddleware');
 const router = express.Router();
 
-router.get('/', getCourses);
+router.get('/', optionalProtect, getCourses);
 router.post('/', protect, authorize('instructor', 'admin'), createCourse);
 
 router.get('/popular', getPopularCourses);

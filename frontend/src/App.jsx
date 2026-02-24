@@ -23,6 +23,7 @@ import SkillGraphView from './pages/SkillGraphView';
 import MyCourses from './pages/MyCourses';
 import CheckoutPage from './pages/CheckoutPage';
 import PaymentSuccess from './pages/PaymentSuccess';
+import ChatPage from './pages/ChatPage';
 import MainLayout from './layouts/MainLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -177,6 +178,14 @@ function AppRoutes() {
         <ProtectedRoute>
           <MainLayout onLogout={logout}>
             <QuizPage />
+          </MainLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/messages" element={
+        <ProtectedRoute>
+          <MainLayout onLogout={logout}>
+            <ChatPage />
           </MainLayout>
         </ProtectedRoute>
       } />

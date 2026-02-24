@@ -19,6 +19,7 @@ const AdminDashboard = () => {
     const navigate = useNavigate();
     const [users, setUsers] = useState([]);
     const [courses, setCourses] = useState([]);
+    const [pendingPayments, setPendingPayments] = useState([]);
     const [skills, setSkills] = useState([]);
     const [stats, setStats] = useState({
         totalUsers: 0,
@@ -36,7 +37,6 @@ const AdminDashboard = () => {
     const [settings, setSettings] = useState([]);
     const [pendingInstructors, setPendingInstructors] = useState([]);
     const [pendingCourses, setPendingCourses] = useState([]);
-    const [pendingPayments, setPendingPayments] = useState([]);
     const [isSkillModalOpen, setIsSkillModalOpen] = useState(false);
     const [editingSkill, setEditingSkill] = useState(null);
     const [isPayoutModalOpen, setIsPayoutModalOpen] = useState(false);
@@ -69,6 +69,8 @@ const AdminDashboard = () => {
             setCategories(catRes.data);
             const settingRes = await api.get('/admin/settings');
             setSettings(settingRes.data);
+            const pendingPayRes = await api.get('/admin/payments/pending');
+            setPendingPayments(pendingPayRes.data);
 
             setPendingInstructors(userRes.data.filter(u => u.role === 'instructor' && u.status === 'pending'));
             setPendingCourses(courseRes.data.filter(c => !c.isApproved || (c.updateRequest && c.updateRequest.status === 'pending')));
@@ -295,6 +297,37 @@ const AdminDashboard = () => {
                                             <Button type="primary" style={{ background: '#00d1b2', border: 'none', color: '#0a192f' }} onClick={() => approveInstructor(record._id)}>Approve</Button>
                                             <Button danger style={{ background: 'transparent', border: '1px solid #e63946', color: '#e63946' }} onClick={() => api.post('/admin/approve-instructor', { userId: record._id, status: 'rejected' }).then(fetchData)}>Reject</Button>
                                         </Space>
+                                    )
+                                }
+                            ]}
+                            rowKey="_id"
+                        />
+                    </Card>
+                </TabPane>
+                <TabPane tab={<span style={{ color: activeTab === '3' ? '#00d1b2' : '#8892b0' }}>Payment Audit</span>} key="3">
+                    <Card title={<span style={{ color: '#ccd6f6' }}>UPI Manual Verification Queue</span>} className="glass-card" style={{ background: 'rgba(17, 34, 64, 0.7)' }}>
+                        <Table
+                            dataSource={pendingPayments}
+                            columns={[
+                                { title: <span style={{ color: '#8892b0' }}>Student</span>, dataIndex: ['userId', 'name'], render: (t) => <span style={{ color: '#ccd6f6' }}>{t}</span> },
+                                { title: <span style={{ color: '#8892b0' }}>Course</span>, dataIndex: ['courseId', 'title'], render: (t) => <span style={{ color: '#ccd6f6' }}>{t}</span> },
+                                { title: <span style={{ color: '#8892b0' }}>Transaction ID</span>, dataIndex: 'transactionId', render: (t) => <Tag color="cyan">{t}</Tag> },
+                                { title: <span style={{ color: '#8892b0' }}>Amount</span>, dataIndex: 'amount', render: (a) => <span style={{ color: '#00d1b2' }}>${a}</span> },
+                                {
+                                    title: <span style={{ color: '#8892b0' }}>Actions</span>,
+                                    render: (_, record) => (
+                                        <Button
+                                            type="primary"
+                                            size="small"
+                                            style={{ background: '#00d1b2', border: 'none', color: '#0a192f' }}
+                                            onClick={async () => {
+                                                await api.post('/admin/confirm-payment', { paymentId: record._id });
+                                                message.success('Payment verified & Enrollment activated');
+                                                fetchData();
+                                            }}
+                                        >
+                                            Confirm Receipt
+                                        </Button>
                                     )
                                 }
                             ]}

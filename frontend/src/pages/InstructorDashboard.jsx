@@ -22,6 +22,7 @@ import {
 import api from '../services/api';
 import LessonManager from '../components/LessonManager';
 import QuizManager from '../components/QuizManager';
+import ChatWindow from '../components/ChatWindow';
 
 const { Title, Text, Paragraph } = Typography;
 const { TabPane } = Tabs;
@@ -88,14 +89,15 @@ const InstructorDashboard = () => {
 
     const fetchData = async () => {
         try {
-            const [perfRes, courseRes, statsRes, payoutRes, reviewRes, msgRes, profileRes] = await Promise.all([
+            const [perfRes, courseRes, statsRes, payoutRes, reviewRes, msgRes, profileRes, convRes] = await Promise.all([
                 api.get('/instructor/performance'),
                 api.get('/courses'),
                 api.get('/instructor/stats'),
                 api.get('/instructor/payouts'),
                 api.get('/instructor/reviews'),
                 api.get('/instructor/messages'),
-                api.get('/auth/me')
+                api.get('/auth/me'),
+                api.get('/instructor/conversations')
             ]);
 
             setPerformance(perfRes.data);
@@ -105,6 +107,7 @@ const InstructorDashboard = () => {
             setReviews(reviewRes.data);
             setMessages(msgRes.data);
             setUserData(profileRes.data);
+            setConversations(convRes.data);
             profileForm.setFieldsValue(profileRes.data);
         } catch (error) {
             console.error('Error fetching instructor data', error);

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Card, Typography, Progress, Table, Tag, Space, Avatar, Button, Tabs } from 'antd';
-import { BookOutlined, RiseOutlined, CheckCircleOutlined, TrophyOutlined, PlayCircleOutlined } from '@ant-design/icons';
+import { BookOutlined, RiseOutlined, CheckCircleOutlined, TrophyOutlined, PlayCircleOutlined, MessageOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import ChatWindow from '../components/ChatWindow';
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
@@ -253,6 +254,13 @@ const StudentDashboard = () => {
                             rowKey="_id"
                         />
                     </Card>
+                </TabPane>
+                <TabPane tab={<Space><MessageOutlined /> Support Session</Space>} key="4">
+                    <ChatWindow
+                        receiverId={courses[0]?.courseId?.instructorId?._id || courses[0]?.courseId?.instructorId}
+                        courseId={courses[0]?.courseId?._id}
+                    />
+                    <Text type="secondary" style={{ marginTop: 8, display: 'block' }}>Connected to primary module instructor.</Text>
                 </TabPane>
             </Tabs>
         </div>

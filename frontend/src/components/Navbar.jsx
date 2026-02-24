@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Space, Layout, Menu, Avatar, Dropdown, Typography } from 'antd';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { LogoutOutlined, DashboardOutlined } from '@ant-design/icons';
+import { LogoutOutlined, DashboardOutlined, BellOutlined, MessageOutlined } from '@ant-design/icons';
+import { Badge } from 'antd';
 import { useAuth } from '../context/AuthContext';
 
 const { Header } = Layout;
@@ -12,14 +13,31 @@ const Navbar = () => {
     const location = useLocation();
     const { user, logout } = useAuth();
     const [scrolled, setScrolled] = useState(false);
+    const [notifications, setNotifications] = useState([]);
 
     useEffect(() => {
         const handleScroll = () => {
             setScrolled(window.scrollY > 50);
         };
+        const fetchNotifications = async () => {
+            if (user) {
+                try {
+                    const endpoint = user.role === 'student' ? '/student/messages' : '/instructor/messages';
+                    const { data } = await api.get(endpoint);
+                    setNotifications(data.filter(m => !m.read && m.receiver?._id === user._id));
+                } catch (err) {
+                    console.error('Failed to fetch notifications');
+                }
+            }
+        };
         window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+        fetchNotifications();
+        const interval = setInterval(fetchNotifications, 30000); // Polling every 30s as fallback to Socket
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            clearInterval(interval);
+        };
+    }, [user]);
 
     const navItems = [
         { key: 'home', label: 'Home', onClick: () => navigate('/') },
@@ -109,6 +127,14 @@ const Navbar = () => {
             />
 
             <Space size="large">
+                {user && (
+                    <Badge count={notifications.length} offset={[0, 10]}>
+                        <BellOutlined
+                            style={{ fontSize: 20, color: '#8892b0', cursor: 'pointer' }}
+                            onClick={() => navigate('/dashboard')}
+                        />
+                    </Badge>
+                )}
                 {user ? (
                     /* Logged In: Show User Avatar */
                     <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" arrow>

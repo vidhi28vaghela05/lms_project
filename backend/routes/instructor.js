@@ -8,7 +8,8 @@ const {
   updateProfile,
   changePassword,
   getMessages,
-  sendMessage
+  sendMessage,
+  getConversations
 } = require('../controllers/instructorController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 const router = express.Router();
@@ -22,5 +23,6 @@ router.put('/update-profile', protect, authorize('instructor'), updateProfile);
 router.put('/change-password', protect, authorize('instructor'), changePassword);
 router.get('/messages', protect, authorize('instructor'), getMessages);
 router.post('/messages', protect, authorize('instructor'), sendMessage);
+router.get('/conversations', protect, authorize('instructor'), getConversations);
 
 module.exports = router;

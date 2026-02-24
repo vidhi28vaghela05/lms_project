@@ -144,19 +144,51 @@ exports.getMessages = async (req, res) => {
 
 exports.sendMessage = async (req, res) => {
   try {
-    const { message } = req.body;
-    // For instructor panel, receiver is always the admin if not specified
-    // In a real app, you might find an admin user or use a flag
-    let admin = await User.findOne({ role: 'admin' });
-    if (!admin) return res.status(404).json({ message: 'Admin not found' });
+    const { message, receiverId, courseId } = req.body;
+    
+    let finalReceiverId = receiverId;
+    if (!finalReceiverId) {
+      let admin = await User.findOne({ role: 'admin' });
+      if (!admin) return res.status(404).json({ message: 'Admin not found' });
+      finalReceiverId = admin._id;
+    }
 
     const newMessage = await Message.create({
       sender: req.user.id,
-      receiver: admin._id,
-      message
+      receiver: finalReceiverId,
+      message,
+      courseId
     });
 
     res.status(201).json(newMessage);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getConversations = async (req, res) => {
+  try {
+    const messages = await Message.find({
+      $or: [{ sender: req.user.id }, { receiver: req.user.id }]
+    })
+    .sort({ createdAt: -1 })
+    .populate('sender receiver', 'name role');
+
+    // Grouping logic for "speedy" dashboard access
+    const conversations = {};
+    messages.forEach(msg => {
+      const otherUser = msg.sender._id.toString() === req.user.id ? msg.receiver : msg.sender;
+      if (!conversations[otherUser._id]) {
+        conversations[otherUser._id] = {
+          user: otherUser,
+          lastMessage: msg.message,
+          timestamp: msg.createdAt,
+          unread: !msg.read && msg.receiver._id.toString() === req.user.id
+        };
+      }
+    });
+
+    res.json(Object.values(conversations));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

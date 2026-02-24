@@ -9,10 +9,11 @@ import {
     LogoutOutlined,
     DashboardOutlined,
     WalletOutlined,
-    IdcardOutlined
+    IdcardOutlined,
+    MessageOutlined
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
-import LiveSupport from '../components/LiveSupport';
+import FloatingChatBubble from '../components/chat/FloatingChatBubble';
 
 const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
@@ -42,6 +43,7 @@ const MainLayout = ({ children, onLogout }) => {
                 ...common,
                 { key: '/my-courses', icon: <BookOutlined />, label: 'My Courses' },
                 { key: '/skill-graph', icon: <LineChartOutlined />, label: 'Skill Graph' },
+                { key: '/messages', icon: <MessageOutlined />, label: 'Messaging Center' },
                 { key: '/billing', icon: <WalletOutlined />, label: 'Billing & History' },
                 { key: '/profile', icon: <IdcardOutlined />, label: 'My Profile' },
             ];
@@ -50,11 +52,13 @@ const MainLayout = ({ children, onLogout }) => {
                 ...common,
                 { key: '/manage-courses', icon: <BookOutlined />, label: 'Manage Courses' },
                 { key: '/analytics', icon: <LineChartOutlined />, label: 'Analytics' },
+                { key: '/messages', icon: <MessageOutlined />, label: 'Messaging Center' },
             ];
         } else if (role === 'admin') {
             return [
                 ...common,
                 { key: '/manage-users', icon: <UserOutlined />, label: 'Manage Users' },
+                { key: '/messages', icon: <MessageOutlined />, label: 'Messaging Center' },
                 { key: '/system-stats', icon: <LineChartOutlined />, label: 'System Stats' },
             ];
         }
@@ -145,7 +149,7 @@ const MainLayout = ({ children, onLogout }) => {
                     {children}
                 </Content>
             </Layout>
-            <LiveSupport />
+            <FloatingChatBubble />
         </Layout>
     );
 };
